@@ -29,11 +29,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait, Select
 
 # 自作モジュール
-from logger.debug_logger import Logger
-from spreadsheet.read import Read
+from method.utils import Logger
 from method.errorNotify import ErrorDiscord
 
 # ----------------------------------------------------------------------------------
+####################################################################################
 
 
 class AutoLogin:
@@ -43,10 +43,11 @@ class AutoLogin:
 
         self.logger = self.setup_logger(debug_mode=debug_mode)
 
-        self.error_discord = ErrorDiscord(discord_url=self.discord_url)
+        self.error_discord = ErrorDiscord(chrome=self.chrome, discord_url=self.discord_url)
 
 
 
+####################################################################################
 
 # ----------------------------------------------------------------------------------
 # Loggerセットアップ
@@ -60,7 +61,7 @@ class AutoLogin:
 # ----------------------------------------------------------------------------------
 # 対象のサイトを開く
 
-    def open_site(self, url, by_pattern, userid_path, field_name):
+    def open_site(self, url, by_pattern, check_path, field_name):
 
         # サイトを開く前にurlを確認
         self.logger.debug(f"{field_name} url: {url}")
@@ -72,19 +73,29 @@ class AutoLogin:
         self.logger.debug(f"{field_name} URL: {current_url}")
 
         try:
+            print(f'by_pattern: {by_pattern}')
             self.logger.debug(f"IDなどを入力 ができるかを確認")
-            WebDriverWait(self.chrome, 10).until(EC.presence_of_element_located((by_pattern, userid_path)))
+            WebDriverWait(self.chrome, 10).until(EC.presence_of_element_located((self._locator_select(by_pattern), check_path)))
             self.logger.debug(f"{field_name}  入力準備 完了")
 
         except TimeoutException as e:
-            self.logger.error(f"{field_name} ロードに10秒以上かかってしまったためタイムアウト: {e}")
-            self.error_discord.process(
-                f"{field_name}: ロードに10秒以上かかってしまったためタイムアウト",
-                str(e)
-            )
+            self.logger.info(f"{field_name} 初回ロードに10秒以上かかってしまったためリロード: {e}")
+
+            self.chrome.refresh()
+            try:
+                self.logger.debug(f"IDなどを入力 ができるかを確認")
+                WebDriverWait(self.chrome, 10).until(EC.presence_of_element_located((self._locator_select(by_pattern), check_path)))
+                self.logger.debug(f"{field_name}  入力準備 完了")
+
+            except TimeoutException as e:
+                self.logger.info(f"{field_name} 2回目のロードエラーのためタイムアウト: {e}")
+                self.error_discord.process(
+                    f"{field_name}: 2回目のロードエラーのためタイムアウト",
+                    str(e)
+                )
 
         except NoSuchElementException as e:
-            self.logger.error(f" 要素が見つかりません: {by_pattern}: {userid_path}, {e}")
+            self.logger.error(f" 要素が見つかりません: {by_pattern}: {check_path}, {e}")
             self.error_discord.process(
                 f"{field_name}: 要素が見つかりません",
                 str(e)
@@ -92,7 +103,7 @@ class AutoLogin:
 
         except WebDriverException as e:
             self.logger.error(f"{field_name} webdriverでのエラーが発生: {e}")
-            self.error_screenshot_discord.process(
+            self.error_discord.process(
                 f"{field_name}: webdriverでのエラーが発生",
                 str(e)
             )
@@ -105,6 +116,26 @@ class AutoLogin:
             )
 
         time.sleep(2)
+
+
+# ----------------------------------------------------------------------------------
+# ロケーター選択→直接文字列で入れ込むことができない
+
+    def _locator_select(self, locator):
+        mapping = {
+            'ID' : By.ID,
+            'XPATH' : By.XPATH,
+            'CLASS' : By.CLASS_NAME,
+            'CSS' : By.CSS_SELECTOR,
+            'TAG' : By.TAG_NAME,
+            'NAME' : By.NAME,
+            'LINK_TEXT': By.LINK_TEXT,  # リンクテキスト全体に一致する要素を見つける
+            'PARTIAL_LINK_TEXT': By.PARTIAL_LINK_TEXT  # リンクテキストの一部に一致する要素を見つける
+        }
+
+        # 入力された文字を大文字に直して選択
+        return mapping.get(locator.upper())
+
 
 
 # ----------------------------------------------------------------------------------
@@ -159,7 +190,7 @@ class AutoLogin:
 # ----------------------------------------------------------------------------------
 # Cookieを取得して保存期間をテキストにする
 
-    def _save_cookies_to_text_file(self, cookies, full_path, field_name):
+    def _save_cookies_to_text_file(self, cookies, full_path, field_name) -> None:
         try:
             with open(f'{full_path}_cookie.txt', 'w', encoding='utf-8') as file:
                 for cookie in cookies:
@@ -190,7 +221,7 @@ class AutoLogin:
 # ----------------------------------------------------------------------------------
 # Cookieをpickle化する
 
-    def _save_cookies_to_pickle_file(self, cookies, full_path, field_name):
+    def _save_cookies_to_pickle_file(self, cookies, full_path, field_name) -> None:
         try:
             # pickleデータを蓄積（ディレクトリがなければ作成）
             with open(full_path + '.pkl', 'wb') as file:
@@ -220,7 +251,7 @@ class AutoLogin:
 # ----------------------------------------------------------------------------------
 # pickleデータを読み込む
 
-    def pickle_load(self, pickle_file_path, field_name):
+    def pickle_load(self, pickle_file_path, field_name) -> None:
         try:
             # Cookieファイルを展開
             self.logger.debug(f"{field_name}:  Cookie 読み込み 開始")
@@ -254,7 +285,7 @@ class AutoLogin:
 # ----------------------------------------------------------------------------------
 # Cookieを使ってログイン
 
-    def cookie_login(self, main_url, pickle_file_path, field_name):
+    def cookie_login(self, main_url, pickle_file_path, field_name) -> None:
         # cookiesを初期化
         cookies = []
 

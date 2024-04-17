@@ -7,12 +7,13 @@ import os,requests
 from datetime import datetime
 
 # 自作モジュール
-from logger.debug_logger import Logger
+from method.utils import Logger
 
 
 # ----------------------------------------------------------------------------------
 class ErrorDiscord:
-    def __init__(self, discord_url, debug_mode=False):
+    def __init__(self, chrome, discord_url, debug_mode=False):
+        self.chrome = chrome
         self.discord_url = discord_url  # メインまで渡す
         self.logger = self.setup_logger(debug_mode=debug_mode)
 
@@ -28,18 +29,18 @@ class ErrorDiscord:
 # ----------------------------------------------------------------------------------
 # スクショ用のフルパス生成
 
-    def _get_full_path(self, file_name):
+    def _get_full_path(self, file_name) -> str:
         # 1つ前の親要素のディレクトリに移動
         base_dir = os.path.dirname(os.path.abspath(__file__))
 
-        # さらにもう一つ前の親要素へディレクトリを移動
-        parent_dir = os.path.dirname(base_dir)
+        # # さらにもう一つ前の親要素へディレクトリを移動
+        # parent_dir = os.path.dirname(base_dir)
 
         # スクショ保管場所の絶対path
-        screenshot_dir = os.path.join(parent_dir, 'DebugScreenshot/')
+        screenshot_dir = os.path.join(base_dir, 'DebugScreenshot/')
 
         full_path = os.path.join(screenshot_dir, file_name)
-        self.logger.debug(" フルパスではないため生成 終了")
+        # self.logger.debug(f"full_path: {full_path}")
 
         return full_path
 
@@ -47,7 +48,7 @@ class ErrorDiscord:
 # ----------------------------------------------------------------------------------
 # スクショをタイムスタンプ付きで撮影
 
-    def _get_screenshot(self):
+    def _get_screenshot(self) -> str:
         # スクショ用のタイムスタンプ
         timestamp = datetime.now().strftime("%m-%d_%H-%M")
 
@@ -69,7 +70,7 @@ class ErrorDiscord:
 # ----------------------------------------------------------------------------------
 # discordでの通知
 
-    def process(self, comment, e):
+    def process(self, comment, e) -> None:
 
         screenshot_path = self._get_screenshot()
 
@@ -81,6 +82,23 @@ class ErrorDiscord:
 
         # 最後にエラーで返す
         raise Exception(f"【WARNING】{comment}: {e}")
+
+
+# ----------------------------------------------------------------------------------
+# エラーではない箇所でのdiscordでの通知
+
+    def no_error_process(self, comment) -> None:
+
+        screenshot_path = self._get_screenshot()
+
+        content = f"【WARNING】{comment}"
+
+        with open(screenshot_path, 'rb') as file:
+            files = {"file": (screenshot_path, file, "image/png")}
+            response = requests.post(self.discord_url, data={"content": content}, files=files)
+
+        # 最後にエラーで返す
+        raise Exception(f"【WARNING】{comment}")
 
 
 # ----------------------------------------------------------------------------------
