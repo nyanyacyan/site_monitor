@@ -56,6 +56,7 @@ venv_shopers_scraping/
 # 仮想環境
 venv/
 
+
 # 仮想環境を直接指定
 venv_site_monitor/
 
