@@ -8,22 +8,19 @@ import os, time
 
 
 # 自作モジュール
-from spreadsheet_read import SpreadsheetRead
-from method.utils import Logger, NoneChecker
+from .OverRide import StartSpreadsheetRead
+from .base.utils import Logger
 # ----------------------------------------------------------------------------------
 ####################################################################################
 # 一連の流れ
 
 class Flow:
-    def __init__(self, sheet_url, brand_id, index, debug_mode=False):
-        self.sheet_url = sheet_url
+    def __init__(self, brand_id, debug_mode=False):
         self.brand_id = brand_id
-        self.index = index
-        self.logger = self.setup_logger(debug_mode=debug_mode)
 
         # インスタンス
-        self.read = SpreadsheetRead(sheet_url=self.sheet_url, brand_id=self.brand_id, index=self.index)
-
+        self.start_spreadsheet = StartSpreadsheetRead(brand_id=self.brand_id)
+        self.logger = self.setup_logger(debug_mode=debug_mode)
 
 ####################################################################################
 # ----------------------------------------------------------------------------------
@@ -38,81 +35,45 @@ class Flow:
 
 # ----------------------------------------------------------------------------------
 # スプシから「ブランド名」を読み込む
-
-    def get_name(self, field_name='get_name'):
-        self.logger.debug(f"***** {field_name} 開始*****")
-
-        id = self.read.get_id(
-            name='ブランド名',
-            field_name=field_name
-        )
-
-        return id
-
-        self.logger.debug(f"***** {field_name} 終了*****")
-
-
-# ----------------------------------------------------------------------------------
-# スプシから「URL」を読み込む
-
-    def get_url(self, field_name='get_url'):
-        self.logger.debug(f"***** {field_name} 開始*****")
-
-        url = self.read.get_url(
-            url='サイトURL',
-            field_name=field_name
-        )
-
-        return url
-
-        self.logger.debug(f"***** {field_name} 終了*****")
-
-
-# ----------------------------------------------------------------------------------
 #todo サイトを開く
 # 専用のURLを使う
 # 画面領域は広く取る
 # 新着順に並び替える
 
-# ----------------------------------------------------------------------------------
 #todo 商品のリスト読み込む
 # ブランド名（各メソッドに埋め込めるようにする）
 # ジャンル
 # 商品状態
 # DataFrameにして比較できるようにする
 
-
-
-
-
-# ----------------------------------------------------------------------------------
 #todo 過去のバイナリデータを読み込む
 # バイナリデータを読み込むクラスを作成
 # バイナリデータをdfにして比較できるようにする
 
-
-
-
-# ----------------------------------------------------------------------------------
 #todo 比較して「過去のデータにない商品」を真偽値で示す
 # 真偽値にてFalseだった場合には処理を終了
 
-
-
-# ----------------------------------------------------------------------------------
 #todo 比較して「過去のデータにない商品」をピックアップする
 
-
-
-
-# ----------------------------------------------------------------------------------
 #todo 最新のデータをバイナリデータで保存
 
-
-
-
-# ----------------------------------------------------------------------------------
 #todo 新着商品がある場合に通知
+
+
+    def single_process(self, field_name='monitor_flow'):
+        self.logger.debug(f"***** {field_name} 開始*****")
+
+        self.start_spreadsheet.get_name()
+        self.start_spreadsheet.get_url()
+
+
+
+
+
+
+
+        self.logger.debug(f"***** {field_name} 開始*****")
+
 
 
 
@@ -135,6 +96,4 @@ class Flow:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # テスト実施
 
-if __name__ == '__main__':
-    test_flow = Flow()
-    test_flow.process()
+
