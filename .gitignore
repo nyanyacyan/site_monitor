@@ -67,3 +67,6 @@ DebugScreenshot/
 # pycache
 __pycache__/
 *.pyc
+
+*.vscode
+.vscode/
