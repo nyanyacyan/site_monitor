@@ -15,16 +15,16 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.common.exceptions import (ElementNotInteractableException,
                                         NoSuchElementException,
                                         InvalidSelectorException,
                                         TimeoutException)
 
 # 自作モジュール
-from installer.src.method.DebugScreenshot.utils import Logger, NoneChecker
-from installer.src.method.base.driver_utils import Wait
-from installer.src.method.base.errorNotify import ErrorDiscord
+from .utils import Logger, NoneChecker
+from .driver_utils import Wait
+from .errorNotify import ErrorDiscord
 
 
 # ----------------------------------------------------------------------------------
@@ -448,3 +448,40 @@ class Base:
 
 
 # ----------------------------------------------------------------------------------
+
+
+    def drop_down_select(self, by_pattern, xpath, select_word, field_name='drop_down_select'):
+        try:
+            self.logger.debug(f"********** {field_name} 処理 開始 **********")
+            self.logger.debug(f"by_pattern: {by_pattern} xpath: {xpath}")
+
+            self.logger.debug(f"{field_name} 捜索 開始")
+            select_element = self.chrome.find_element(self._locator_select(by_pattern), xpath)
+            self.logger.debug(f"{field_name} 発見")
+
+            self.logger.debug(f"{field_name} 選択 開始")
+            self.logger.debug(f"{field_name} select_word: {select_word}")
+
+            # ドロップダウンメニューを選択できるように指定
+            select_object = Select(select_element)
+
+            # 選択肢をChoice
+            select_object.select_by_visible_text(select_word)
+            self.logger.debug(f"{field_name} 選択 終了")
+
+            # ボタンを押した後のページ読み込みの完了確認
+            self.driver_wait._js_page_checker(field_name=field_name)
+
+        except NoSuchElementException as e:
+            self.error_screenshot_discord(
+                f"{self.account_id}: {field_name} 要素が見つからない",  # discordへの出力
+                str(e)
+            )
+
+        except Exception as e:
+            self.error_screenshot_discord(
+                f"{self.account_id}: {field_name} 処理中にエラーが発生",  # discordへの出力
+                str(e)
+            )
+
+        time.sleep(1)

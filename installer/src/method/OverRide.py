@@ -10,6 +10,7 @@ import os
 # 自作モジュール
 from .base.chrome import ChromeManager
 from .base.spreadsheet_read import SpreadsheetRead
+from .base.driverLogin import AutoLogin
 
 from dotenv import load_dotenv
 
@@ -51,6 +52,18 @@ class StartSpreadsheetRead(SpreadsheetRead):
 
 ####################################################################################
 
+
+class OverAutoLogin(AutoLogin):
+    def __init__(self, chrome, discord_url, debug_mode=False):
+        super().__init__(chrome, discord_url, debug_mode)
+
+
+    def open_site(self, url):
+
+        by_pattern='id'
+        check_path='searchOrder'
+        field_name='open_site'
+        return super().open_site(url, by_pattern, check_path, field_name)
 
 
 ####################################################################################

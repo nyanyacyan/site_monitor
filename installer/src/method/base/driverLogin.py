@@ -3,34 +3,22 @@
 # 2023/3/29更新
 
 # ----------------------------------------------------------------------------------
-import asyncio
-import functools
 import os
 import pickle
 import time
 import requests
-import pyperclip
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
 
-
-from dotenv import load_dotenv
-
-from selenium import webdriver
-from selenium.common.exceptions import (ElementNotInteractableException,
-                                        NoSuchElementException,
-                                        UnexpectedAlertPresentException,
-                                        NoAlertPresentException,
+from selenium.common.exceptions import (NoSuchElementException,
                                         WebDriverException,
                                         TimeoutException)
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support.ui import WebDriverWait
 
 # 自作モジュール
-from installer.src.method.DebugScreenshot.utils import Logger
-from installer.src.method.base.errorNotify import ErrorDiscord
+from .utils import Logger
+from .errorNotify import ErrorDiscord
 
 # ----------------------------------------------------------------------------------
 ####################################################################################

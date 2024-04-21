@@ -18,8 +18,8 @@ from selenium.common.exceptions import (ElementNotInteractableException,
                                         TimeoutException)
 
 # 自作モジュール
-from utils import Logger
-from installer.src.method.base.errorNotify import ErrorDiscord
+from .utils import Logger
+from .errorNotify import ErrorDiscord
 
 ####################################################################################
 # from driver_utils import Wait

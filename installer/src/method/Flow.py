@@ -8,7 +8,7 @@ import os, time
 
 
 # 自作モジュール
-from .OverRide import StartSpreadsheetRead
+from .OverRide import OverChrome, StartSpreadsheetRead, OverAutoLogin
 from .base.utils import Logger
 # ----------------------------------------------------------------------------------
 ####################################################################################
@@ -19,7 +19,12 @@ class Flow:
         self.brand_id = brand_id
 
         # インスタンス
+        self.chrome.inst = OverChrome(debug_mode=debug_mode)
+        self.chrome = self.chrome.inst
+        self.discord_url = os.getenv('DISCORD_BOT_URL')
+
         self.start_spreadsheet = StartSpreadsheetRead(brand_id=self.brand_id)
+        self.auto_login = OverAutoLogin(chrome=self.chrome, discord_url=self.discord_url, debug_mode=debug_mode)
         self.logger = self.setup_logger(debug_mode=debug_mode)
 
 ####################################################################################
@@ -63,10 +68,10 @@ class Flow:
     def single_process(self, field_name='monitor_flow'):
         self.logger.debug(f"***** {field_name} 開始*****")
 
-        self.start_spreadsheet.get_name()
-        self.start_spreadsheet.get_url()
+        brand_name = self.start_spreadsheet.get_name()
+        url = self.start_spreadsheet.get_url()
 
-
+        self.auto_login.open_site(url=url)
 
 
 
