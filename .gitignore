@@ -25,7 +25,6 @@ logs/
 *.txt
 whisper_write_file.txt
 
-venv_shopers_scraping/
 
 # テストファイルを無視する。
 *test*
