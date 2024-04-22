@@ -64,6 +64,7 @@ class DFCreate:
 
 # ----------------------------------------------------------------------------------
 # 受け取ったデータをDataFrameに書き換える
+#TODO: resultがNoneかどうかをチェックする
 
     def _convert_to_dataframe(self, data):
         # 辞書データをDataFrameに変換
@@ -73,6 +74,7 @@ class DFCreate:
 
 # ----------------------------------------------------------------------------------
 # 指定した要素の値を取得
+#TODO: resultがNoneかどうかをチェックする
 
     def _get_element_value(self, by_pattern, xpath, search_name, field_name):
         try:
@@ -91,6 +93,7 @@ class DFCreate:
 
 # ----------------------------------------------------------------------------------
 # リストを作成してcategory_nameをColumnにしてデータを整理
+#TODO: resultがNoneかどうかをチェックする
 
     def _sort_data(self, by_pattern, xpath, category_info, field_name):
 
@@ -138,6 +141,7 @@ class DFCreate:
 
 # ----------------------------------------------------------------------------------
 # pickleデータを通常のデータへ変換
+#TODO: resultがNoneかどうかをチェックする
 
     def _pkl_to_utf8(self, pkl_file, field_name):
         try:
@@ -190,13 +194,55 @@ class DFCreate:
 
 
 # ----------------------------------------------------------------------------------
+#TODO: resultがNoneかどうかをチェックする
+
+    def diff_data_list_create(self, new_df, old_df, key_column, field_name):
+        try:
+            # on=[key_column]が「Key」となるデータ
+            # how='left'は左側（new_df）を基準する（old_dfにしかないデータはNaN）
+            result = pd.merge(new_df, old_df, on=[key_column], how='left', indicator=True)
+
+            self.logger.debug(f"{field_name} result: {result}")
+
+            # resultの中のresultの部分の_mergeのColumnをleft_onlyだけする
+            diff_data = result[result['_merge'] == 'left_only']
+            self.logger.debug(f"{field_name} diff_data: {diff_data}")
+
+            # dfより「_merge」（被ってる部分）を削除
+            diff_data = diff_data.drop(columns=['_merge'])
+
+            return diff_data
+
+        except Exception as e:
+            self.logger.error(f"{field_name} 差分データを作成中にエラーが発生: {e}")
 
 
-    def diff_data_list_create(self):
-        new_df
 
 
 # ----------------------------------------------------------------------------------
+# 通知に掲載するためのデフォルトのデータを整理するためのメソッド
+#TODO: resultがNoneかどうかをチェックする
+
+    def notify_sentence_create(self, diff_df, Key_title, value1_title, value2_title, value3_title, field_name):
+        sentences = []
+        self.logger.debug(f"{field_name} diff_df: {diff_df}")
+
+        try:
+            for _, row in diff_df.iterrows():
+                sentence = f"{Key_title}: {row['Key']}, {value1_title}: {row['Value1']}, {value2_title}: {row['Value2']}, {value3_title}: {row['Value3']}"
+                sentences.append(sentence)
+
+            all_sentences = "\n".join(sentences)
+            self.logger.debug(f"{field_name} sentences\n{all_sentences}")
+
+            return all_sentences
+
+        except KeyError as e:
+            self.logger.error(f"{field_name} キーのエラー、データフレームに期待されるカラムが存在しない: {e}")
+
+        except Exception as e:
+            self.logger.error(f"{field_name} 差分データを修正中にエラーが発生: {e}")
 
 
-    def old
+
+# ----------------------------------------------------------------------------------
