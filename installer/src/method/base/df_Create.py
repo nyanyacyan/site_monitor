@@ -203,8 +203,17 @@ class DFCreate:
 
             return diff_data
 
+        except KeyError as e:
+            self.logger.error(f"{field_name} キーのエラー、データフレームに期待されるカラムが存在しない: {e}")
+            raise
+
+        except ValueError as e:
+            self.logger.error(f"{field_name} データ型エラー: {e}")
+            raise
+
         except Exception as e:
-            self.logger.error(f"{field_name} 差分データを作成中にエラーが発生: {e}")
+            self.logger.error(f"{field_name} 差分データを修正中にエラーが発生: {e}")
+            raise
 
 
 
@@ -230,9 +239,11 @@ class DFCreate:
 
         except KeyError as e:
             self.logger.error(f"{field_name} キーのエラー、データフレームに期待されるカラムが存在しない: {e}")
+            raise
 
         except Exception as e:
             self.logger.error(f"{field_name} 差分データを修正中にエラーが発生: {e}")
+            raise
 
 
 
