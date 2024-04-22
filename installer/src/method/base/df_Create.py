@@ -96,50 +96,40 @@ class DFCreate:
 #TODO: resultがNoneかどうかをチェックする
 
     def _sort_data(self, by_pattern, xpath, category_info, field_name):
+        try:
+            # 全体から対象のリストを取得
+            item_boxs = self.chrome.find_elements(self._locator_select(by_pattern), xpath)
 
-        # 全体から対象のリストを取得
-        item_boxs = self.chrome.find_elements(self._locator_select(by_pattern), xpath)
+            # データ形式を指定して内包表記にて並び替える
+            # category_name:[_, _] という形式にするように指定してる（初期化）
+            data = {category_name: [] for category_name, _, _ in category_info}
 
-        # データ形式を指定して内包表記にて並び替える
-        # category_name:[_, _] という形式にするように指定してる（初期化）
-        data = {category_name: [] for category_name, _, _ in category_info}
+            # 取得したリストを一つのものから中身を抽出する
+            for item_box in item_boxs:
+                # category_infoという得たデータから３つの情報を抜き取る
+                for category_name, catch_by, catch_path in category_info:
+                    # もしcatch_pathがattributeだった場合にはその値を記す
+                    if catch_path == "attribute":
+                        element_value = item_box.get_attribute(catch_path)
 
-        # 取得したリストを一つのものから中身を抽出する
-        for item_box in item_boxs:
-            # category_infoという得たデータから３つの情報を抜き取る
-            for category_name, catch_by, catch_path in category_info:
-                # もしcatch_pathがattributeだった場合にはその値を記す
-                if catch_path == "attribute":
-                    element_value = item_box.get_attribute(catch_path)
+                    else:
+                    # 得た情報から処理を行って各それぞれの要素を取得する
+                        element = item_box.find_element(catch_by, catch_path)
+                        element_value = element.text
+                    # 取得した各データを指定したデータの箱に入れていく
+                    data[category_name].append(element_value)
 
-                else:
-                # 得た情報から処理を行って各それぞれの要素を取得する
-                    element = item_box.find_element(catch_by, catch_path)
-                    element_value = element.text
-                # 取得した各データを指定したデータの箱に入れていく
-                data[category_name].append(element_value)
+            self.logger.debug(f"{field_name} data: {data}")
 
-        self.logger.debug(f"{field_name} data: {data}")
+            return data
 
-        return data
-
-
-# ----------------------------------------------------------------------------------
-#TODO: テスト期間中はDiscordに通知するようにする
-
-    def diff_checker(self, new_df, old_df, diff_list_create, notify, field_name):
-        current_time = time.time()
-        if new_df.equals(old_df):
-            self.logger.info(f"{field_name} {current_time} 前回のデータとの差異なし")
-
-
-        else:
-            self.logger.warning(f"{field_name} {current_time} 新商品が入荷")
-            diff_list = diff_list_create()
-            list_notify = notify()
+        except Exception as e:
+            self.logger.error(f"{field_name} 商品データを整理中にエラーが発生{e}")
+            raise
 
 
 # ----------------------------------------------------------------------------------
+
 # pickleデータを通常のデータへ変換
 #TODO: resultがNoneかどうかをチェックする
 
@@ -228,8 +218,9 @@ class DFCreate:
         self.logger.debug(f"{field_name} diff_df: {diff_df}")
 
         try:
-            for _, row in diff_df.iterrows():
-                sentence = f"{Key_title}: {row['Key']}, {value1_title}: {row['Value1']}, {value2_title}: {row['Value2']}, {value3_title}: {row['Value3']}"
+            # 各行の項目にColumnの値にアプローチ
+            for index, row in diff_df.iterrows():
+                sentence = f"{index} {Key_title}: {row['Key']}, {value1_title}: {row['Value1']}, {value2_title}: {row['Value2']}, {value3_title}: {row['Value3']}"
                 sentences.append(sentence)
 
             all_sentences = "\n".join(sentences)
@@ -243,6 +234,30 @@ class DFCreate:
         except Exception as e:
             self.logger.error(f"{field_name} 差分データを修正中にエラーが発生: {e}")
 
+
+
+# ----------------------------------------------------------------------------------
+# 通知クラスを入れ込む
+# スクショもいれる
+
+    def LINE_notify(self):
+        pass
+
+
+# ----------------------------------------------------------------------------------
+#TODO: テスト期間中はDiscordに通知するようにする
+#TODO: 通知が完成したら埋め込む
+
+    def diff_checker(self, new_df, old_df, diff_list_create, notify, field_name):
+        current_time = time.time()
+        if new_df.equals(old_df):
+            self.logger.info(f"{field_name} {current_time} 前回のデータとの差異なし")
+
+
+        else:
+            self.logger.warning(f"{field_name} {current_time} 新商品が入荷")
+            diff_list = diff_list_create()
+            list_notify = notify()
 
 
 # ----------------------------------------------------------------------------------
