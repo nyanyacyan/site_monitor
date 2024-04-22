@@ -8,7 +8,7 @@ import os, time
 
 
 # 自作モジュール
-from .OverRide import OverChrome, StartSpreadsheetRead, OverAutoLogin
+from .OverRide import OverChrome, StartSpreadsheetRead, OverAutoLogin, Drop
 from .base.utils import Logger
 # ----------------------------------------------------------------------------------
 ####################################################################################
@@ -25,6 +25,7 @@ class Flow:
 
         self.start_spreadsheet = StartSpreadsheetRead(brand_id=self.brand_id)
         self.auto_login = OverAutoLogin(chrome=self.chrome, discord_url=self.discord_url, debug_mode=debug_mode)
+        self.drop_down = Drop(chrome=self.chrome, discord_url=self.discord_url, debug_mode=debug_mode)
         self.logger = self.setup_logger(debug_mode=debug_mode)
 
 ####################################################################################

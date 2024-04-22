@@ -357,7 +357,8 @@ class Base:
                     str(e)
                 )
 
-# ----------------------------------------------------------------------------------# ロケーター選択→直接文字列で入れ込むことができない
+# ----------------------------------------------------------------------------------
+# ロケーター選択→直接文字列で入れ込むことができない
 
     def _locator_select(self, locator) -> None:
         mapping = {
@@ -465,6 +466,8 @@ class Base:
             # ドロップダウンメニューを選択できるように指定
             select_object = Select(select_element)
 
+            time.sleep(1)
+
             # 選択肢をChoice
             select_object.select_by_visible_text(select_word)
             self.logger.debug(f"{field_name} 選択 終了")
@@ -484,4 +487,6 @@ class Base:
                 str(e)
             )
 
-        time.sleep(1)
+
+
+# ----------------------------------------------------------------------------------
