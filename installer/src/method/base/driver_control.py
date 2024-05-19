@@ -10,37 +10,33 @@ import os
 import time
 import random
 
-from selenium import webdriver
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import (ElementNotInteractableException,
                                         NoSuchElementException,
                                         InvalidSelectorException,
+                                        JavascriptException,
                                         TimeoutException)
 
 # 自作モジュール
 from .utils import Logger, NoneChecker
 from .driver_utils import Wait
-from .errorNotify import ErrorDiscord
 
 
 # ----------------------------------------------------------------------------------
 ####################################################################################
 
 
-class Base:
-    def __init__(self, chrome, discord_url, debug_mode=False):
+class Operation:
+    def __init__(self, chrome, debug_mode=False):
         self.chrome = chrome
-        self.discord_url = discord_url
         self.logger = self.setup_logger(debug_mode=debug_mode)
         self.none = NoneChecker(debug_mode=debug_mode)
-        self.driver_wait = Wait(chrome=self.chrome, discord_url=self.discord_url, debug_mode=debug_mode)
+        self.driver_wait = Wait(chrome=self.chrome, debug_mode=debug_mode)
 
-        # 自作モジュールインスタンス化
-        self.error_discord = ErrorDiscord(chrome=self.chrome, discord_url=self.discord_url, debug_mode=debug_mode)
 
 ####################################################################################
 
@@ -56,8 +52,12 @@ class Base:
 # ----------------------------------------------------------------------------------
 # 要素を探して入力
 
-    def input_write(self, by_pattern, xpath, input_value, field_name) -> None:
+    def input_write(self, by_pattern, xpath, input_value, field_name):
+        self.logger.info(f"*********** input_write 処理 開始 ***********")
+
         try:
+            self.driver_wait._js_page_checker(field_name=field_name)
+
             # 要素を探す
             self.logger.debug(f"{field_name} 捜索 開始")
             self.logger.debug(f"by_pattern: {by_pattern} xpath: {xpath}")
@@ -70,35 +70,31 @@ class Base:
             field.send_keys(input_value)
             self.logger.debug(f"{field_name} 入力 終了")
 
+            self.logger.info(f"*********** input_write 終了 ***********")
+
         except InvalidSelectorException as e:
             self.logger.error(f"{field_name} 選択したロケーターと要素が違う: {e}")
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
 
         except NoSuchElementException as e:
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
+            self.logger.error(f"{field_name} 要素が見つからない: {e}")
 
         except Exception as e:
-            self.error_discord.process(
-                f"[error]{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
+            self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
+
 
 
 # ----------------------------------------------------------------------------------
 # 要素を探して入力したあとにEnterKey
 
-    def input_enterkey(self, by_pattern, xpath, input_value, field_name, timeout) -> None:
+    def input_enterkey(self, by_pattern, xpath, input_value, field_name, timeout):
         try:
+            self.logger.info(f"*********** input_enterkey 処理 開始 ***********")
 
             # 要素を探す
             self.logger.debug(f"{field_name} 捜索 開始")
             self.logger.debug(f"by_pattern: {by_pattern} xpath: {xpath}")
+            self.logger.debug(f"input_value: {input_value}")
+
             search_field = self.chrome.find_element(self._locator_select(by_pattern), xpath)
 
             self.logger.debug(f"{field_name} search_field: {search_field}")
@@ -128,24 +124,17 @@ class Base:
             search_field.send_keys(Keys.ENTER)
             self.logger.debug(f"{field_name} Enterkey 終了")
 
+            self.logger.info(f"*********** input_enterkey 処理 開始 ***********")
+
         except InvalidSelectorException as e:
             self.logger.error(f"{field_name} 選択したロケーターと要素が違う: {e}")
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
 
         except NoSuchElementException as e:
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
+            self.logger.error(f"{field_name} 要素が見つかりません: {e}")
 
         except Exception as e:
-            self.error_discord.process(
-                f"[error]{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
+            self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
+
 
 
 # ----------------------------------------------------------------------------------
@@ -161,21 +150,12 @@ class Base:
 
         except InvalidSelectorException as e:
             self.logger.error(f"{field_name} 選択したロケーターと要素が違う: {e}")
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
+
         except NoSuchElementException as e:
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
+            self.logger.error(f"{field_name} 要素が見つまりません: {e}")
 
         except Exception as e:
-            self.error_discord.process(
-                f"[error]{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
+            self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
 
         return element
 
@@ -184,15 +164,28 @@ class Base:
 # 要素を探してクリック
 # 確認なしバージョン→URLが変わったなどのチェックなし
 
-    def btn_click(self, by_pattern, xpath, field_name) -> None:
+    def btn_click(self, by_pattern, xpath, field_name):
         try:
             current_url = self.chrome.current_url
             # btn要素を探してクリックできる状態になるまで待機
             self.logger.debug(f"{field_name} を捜索 開始")
             self.logger.debug(f"by_pattern: {by_pattern} xpath: {xpath}, current_url: {current_url}")
-            btn = WebDriverWait(self.chrome, 10).until(
-                EC.element_to_be_clickable((self._locator_select(by_pattern), xpath))
-            )
+
+            try:
+                btn = WebDriverWait(self.chrome, 10).until(
+                    EC.element_to_be_clickable((self._locator_select(by_pattern), xpath))
+                )
+
+                self.logger.debug(f"{field_name} btn: {btn}")
+
+            except TimeoutException as e:
+                self.logger.error(f"{field_name} のクリック操作またはページ読み込みでタイムアウト: {e}")
+
+                self.logger.debug(f"{field_name} JavaScript クリック 開始")
+                self.chrome.execute_script("arguments[0].click();", btn)
+                self.logger.debug(f"{field_name} JavaScript クリック 終了")
+
+
             self.logger.debug(f"{field_name} 発見")
 
             # 要素に入力する
@@ -209,31 +202,14 @@ class Base:
 
         except InvalidSelectorException as e:
             self.logger.error(f"{field_name} 選択したロケーターと要素が違う: {e}")
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
+
 
         except NoSuchElementException as e:
             self.logger.error(f"{field_name} の要素が見つからない: {e}")
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
 
-        except TimeoutException as e:
-            self.logger.error(f"{field_name} のクリック操作またはページ読み込みでタイムアウト: {e}")
-            self.error_discord.process(
-                f"{field_name}: のクリック操作またはページ読み込みでタイムアウト",
-                str(e)
-            )
 
         except Exception as e:
             self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
 
         finally:
             try:
@@ -245,30 +221,28 @@ class Base:
 
             except TimeoutException as e:
                 self.logger.error(f"{field_name} ページの読み込み完了待機中にタイムアウト: {e}")
-                self.error_discord.process(
-                    f"{field_name}: のクリック操作またはページ読み込みでタイムアウト",
-                    str(e)
-                )
 
             except Exception as e:
                 self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-                self.error_discord.process(
-                    f"{field_name}: 処理中にエラーが発生",
-                    str(e)
-                )
+
 
 # ----------------------------------------------------------------------------------
 # 要素を探してクリック
 
     def random_btn_click(self, by_pattern, xpath, field_name, timeout=10) -> None:
         try:
+            self.logger.info(f"*********** random_btn_click 処理 開始 ***********")
+
             current_url = self.chrome.current_url
             # btn要素を探してクリックできる状態になるまで待機
             self.logger.debug(f"{field_name} を捜索 開始")
             self.logger.debug(f"by_pattern: {by_pattern} xpath: {xpath}, current_url: {current_url}")
 
             # 重複してる要素を指定して一つの変数にまとめる
-            elements = self.chrome.find_element(self._locator_select(by_pattern), xpath)
+            elements = self.chrome.find_elements(self._locator_select(by_pattern), xpath)
+
+            self.logger.debug(f"{field_name} \nリスト一覧\n{elements}")
+
 
             if not elements:
                 self.logger.debug(f"{field_name} 選定したpathの要素が存在しません（None）")
@@ -309,31 +283,15 @@ class Base:
 
         except InvalidSelectorException as e:
             self.logger.error(f"{field_name} 選択したロケーターと要素が違う: {e}")
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
 
         except NoSuchElementException as e:
             self.logger.error(f"{field_name} の要素が見つからない: {e}")
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
 
         except TimeoutException as e:
             self.logger.error(f"{field_name} のクリック操作またはページ読み込みでタイムアウト: {e}")
-            self.error_discord.process(
-                f"{field_name}: のクリック操作またはページ読み込みでタイムアウト",
-                str(e)
-            )
 
         except Exception as e:
             self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
 
         finally:
             try:
@@ -343,19 +301,15 @@ class Base:
                 )
                 self.logger.debug(f"{field_name} ログインページ読み込み完了")
 
+                self.logger.info(f"*********** random_btn_click 処理 終了 ***********")
+
+
             except TimeoutException as e:
                 self.logger.error(f"{field_name} ページの読み込み完了待機中にタイムアウト: {e}")
-                self.error_discord.process(
-                    f"{field_name}: のクリック操作またはページ読み込みでタイムアウト",
-                    str(e)
-                )
 
             except Exception as e:
                 self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-                self.error_discord.process(
-                    f"{field_name}: 処理中にエラーが発生",
-                    str(e)
-                )
+
 
 # ----------------------------------------------------------------------------------
 # ロケーター選択→直接文字列で入れ込むことができない
@@ -379,25 +333,18 @@ class Base:
 # ----------------------------------------------------------------------------------
 # display:noneを解除
 
-    def _display_none_unlock(self, field_name) -> None:
+    def _display_none_unlock(self, element, field_name) -> None:
         try:
             self.logger.debug(f"{field_name} display:noneを解除 開始")
-            self.chrome.execute_script("document.getElementById('ui-id-2').style.display = 'block';")
+            self.chrome.execute_script("arguments[0].style.display = 'block';", element)
             self.logger.debug(f"{field_name} display:noneを解除 完了開始")
 
-        except NoSuchElementException as e:
-            self.logger.error(" display:none の要素が見つかりません。")
-            self.error_discord.process(
-                f"{field_name}: 要素がみつからない",
-                str(e)
-            )
+        except NoSuchElementException:
+            self.logger.error(f"{field_name} の要素が見つかりません。")
 
         except Exception as e:
             self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
+
 
 # ----------------------------------------------------------------------------------
 # ページがちゃんと表示されるまで待機
@@ -411,17 +358,10 @@ class Base:
 
         except TimeoutException as e:
             self.logger.error(f"{field_name} ページが表示されません: {e}")
-            self.error_discord.process(
-                f"{field_name}: ページ読み込みでタイムアウト",
-                str(e)
-            )
 
         except Exception as e:
             self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
+
 
 # ----------------------------------------------------------------------------------
 # ページが切り替わった際に特定の要素が出るまで待機
@@ -435,58 +375,92 @@ class Base:
 
         except TimeoutException as e:
             self.logger.error(f"10秒待機してもページが表示されません: {e}")
-            self.error_discord.process(
-                f"{field_name}: のクリック操作またはページ読み込みでタイムアウト",
-                str(e)
-            )
+
 
         except Exception as e:
             self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
 
 
 # ----------------------------------------------------------------------------------
 
 
-    def drop_down_select(self, by_pattern, xpath, select_word, field_name='drop_down_select'):
+    def _find_element(self, by_pattern, xpath, field_name):
         try:
-            self.logger.debug(f"********** {field_name} 処理 開始 **********")
-            self.logger.debug(f"by_pattern: {by_pattern} xpath: {xpath}")
+            element = self.chrome.find_element(self._locator_select(by_pattern), xpath)
+            self.logger.debug(f"{field_name} element: {element}")
 
-            self.logger.debug(f"{field_name} 捜索 開始")
-            select_element = self.chrome.find_element(self._locator_select(by_pattern), xpath)
-            self.logger.debug(f"{field_name} 発見")
+            return element
 
-            self.logger.debug(f"{field_name} 選択 開始")
-            self.logger.debug(f"{field_name} select_word: {select_word}")
+        except NoSuchElementException:
+            return None
 
-            # ドロップダウンメニューを選択できるように指定
-            select_object = Select(select_element)
 
-            time.sleep(1)
+# ----------------------------------------------------------------------------------
+# A=whirl, B=3D, C=PUZZLE
+#! ここがおかしい　コンプリート状態が出てないのに先に処理をしている 
+    def _judgement_process(self, A_element_name, A_by, A_xpath, A_process, B_element_name, B_by, B_xpath, B_process, C_element_name, C_by, C_xpath, C_process, D_element_name, D_process, field_name):
 
-            # 選択肢をChoice
-            select_object.select_by_visible_text(select_word)
-            self.logger.debug(f"{field_name} 選択 終了")
+        self.logger.info(f"*********** _judgement_process 処理 開始 ***********")
 
-            # ボタンを押した後のページ読み込みの完了確認
+        try:
+            # サイトがcomplete状態なのかを確認
             self.driver_wait._js_page_checker(field_name=field_name)
 
-        except NoSuchElementException as e:
-            self.error_screenshot_discord(
-                f"{self.account_id}: {field_name} 要素が見つからない",  # discordへの出力
-                str(e)
-            )
+            time.sleep(2)
+
+            if self._find_element(by_pattern=A_by, xpath=A_xpath, field_name='_judgement_process'):
+                self.logger.info(f"{field_name} {A_element_name} 発見")
+                A_process()
+
+                self.logger.debug(f"{field_name} {A_element_name} 処理が完了 {D_element_name} 開始")
+                D_process()
+
+            elif self._find_element(by_pattern=B_by, xpath=B_xpath, field_name='_judgement_process'):
+                self.logger.debug(f"{field_name} {B_element_name} 発見")
+                B_process()
+
+                self.logger.debug(f"{field_name} {B_element_name} 処理が完了 {D_element_name} 開始")
+                D_process()
+
+            elif self._find_element(by_pattern=C_by, xpath=C_xpath, field_name='_judgement_process'):
+                self.logger.debug(f"{field_name} {C_element_name} 発見")
+                C_process()
+
+                self.logger.debug(f"{field_name} {C_element_name} 処理が完了 {D_element_name} 開始")
+                D_process()
+
+            else:
+                self.logger.debug(f"{field_name} 該当なしのため {D_element_name} 開始")
+                D_process()
+
+            self.logger.debug(f"{field_name} {D_element_name} {D_process} 完了")
+
+            self.logger.info(f"*********** _judgement_process 処理 終了 ***********")
+
+        except JavascriptException:
+            self.logger.error(f"{field_name} 冒頭でのJavaScript実行中にエラー")
+            D_process()
 
         except Exception as e:
-            self.error_screenshot_discord(
-                f"{self.account_id}: {field_name} 処理中にエラーが発生",  # discordへの出力
-                str(e)
-            )
-
+            self.logger.error(f"{field_name} 処理中にエラーが発生 {e}")
 
 
 # ----------------------------------------------------------------------------------
+    def js_input(self, field_name='js_input'):
+        self.logger.info(f"*********** js_input 処理 開始 ***********")
+
+        self.driver_wait._js_page_checker(field_name=field_name)
+        try:
+            js_script = """
+            var element = document.querySelector('div[aria-label="メッセージを送信..."]');
+            if (element) {
+                element.style.display = 'block';  // 要素を表示状態にする
+                element.textContent = '素敵な動画ですね';  // テキスト更新
+            }
+            """
+            self.chrome.execute_script(js_script)
+
+        except Exception as e:
+            self.logger.error(f"{field_name} 処理中にエラーが発生 {e}")
+
+        self.logger.info(f"*********** js_input 処理 終了 ***********")

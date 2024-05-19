@@ -17,10 +17,9 @@ load_dotenv()
 ####################################################################################
 
 class SpreadsheetRead:
-    def __init__(self, sheet_url, brand_id, index, debug_mode=False):
+    def __init__(self, sheet_url, account_id, debug_mode=False):
         self.sheet_url = sheet_url
-        self.brand_id = brand_id
-        self.index = index
+        self.account_id = account_id
         self.logger = self.setup_logger(debug_mode=debug_mode)
         self.none = NoneChecker()
 
@@ -54,33 +53,24 @@ class SpreadsheetRead:
 
         df = pd.read_csv(data_io, on_bad_lines='skip')
 
-        self.logger.debug(f"columns: {df.columns}")
-
-        # Indexを「brand_id」にしたデータフレームを返してる
-        return df.set_index(self.index)
+        # Indexを「account_id」にしたデータフレームを返してる
+        return df.set_index('アカウントNo.')
 
 
 # ----------------------------------------------------------------------------------
 # Columnまでの公式を入れ込んだ関数
 
     def _sort_column_name(self, column_name):
-        sort_value = self.df.loc[self.brand_id, column_name]
+        sort_value = self.df.loc[self.account_id, column_name]
         return sort_value
 
 
 # ----------------------------------------------------------------------------------
 # アカウントIDの抽出
 
-    def get_id(self, id, field_name):
-
-        self.logger.debug(f"***** {field_name} 開始*****")
-
-
-        get_id = self._sort_column_name(id)
-        self.logger.debug(f"{field_name} get_id: {get_id}")
-
-
-        self.logger.debug(f"***** {field_name} 終了*****")
+    def get_id(self):
+        get_id = self._sort_column_name('ユーザーネーム')
+        self.logger.debug(f"get_id: {get_id}")
 
         return get_id
 
@@ -88,32 +78,19 @@ class SpreadsheetRead:
 # ----------------------------------------------------------------------------------
 # パスの抽出
 
-    def get_pass(self, password, field_name):
+    def get_pass(self):
+        get_pass = self._sort_column_name('ユーザーパスワード')
+        self.logger.debug(f"get_pass: {get_pass}")
 
-        self.logger.debug(f"***** {field_name} 開始*****")
+        return get_pass
 
-
-        get_password = self._sort_column_name(password)
-        self.logger.debug(f"{field_name} get_password: {get_password}")
-
-
-        self.logger.debug(f"***** {field_name} 終了*****")
-
-        return get_password
 
 # ----------------------------------------------------------------------------------
 # 検索ワードの抽出
 
-    def get_search_word(self, search_word, field_name):
-
-        self.logger.debug(f"***** {field_name} 開始*****")
-
-
-        get_search_word = self._sort_column_name(search_word)
-        self.logger.debug(f"{field_name} get_search_word: {get_search_word}")
-
-
-        self.logger.debug(f"***** {field_name} 終了*****")
+    def get_search_word(self):
+        get_search_word = self._sort_column_name('検索ワード')
+        self.logger.debug(f"get_search_word: {get_search_word}")
 
         return get_search_word
 
@@ -121,65 +98,41 @@ class SpreadsheetRead:
 # ----------------------------------------------------------------------------------
 # 検索時、前から何番目のものを選択するのかを抽出
 
-    def get_select_number(self, select_number, field_name):
-
-        self.logger.debug(f"***** {field_name} 開始*****")
-
-
-        get_select_number = self._sort_column_name(select_number)
-        self.logger.debug(f"{field_name} get_select_number: {get_select_number}")
-
-
-        self.logger.debug(f"***** {field_name} 終了*****")
+    def get_select_number(self):
+        get_select_number = self._sort_column_name('選択No.')
+        self.logger.debug(f"get_select_number: {get_select_number}")
 
         return get_select_number
+
 
 # ----------------------------------------------------------------------------------
 # DMテキスト部分の抽出
 
-    def get_text(self, text, field_name):
+    def get_dm_text(self):
+        get_dm_text = self._sort_column_name('DM送付コメント')
+        self.logger.debug(f"get_dm_text: {get_dm_text}")
 
-        self.logger.debug(f"***** {field_name} 開始*****")
+        return get_dm_text
 
-
-        get_text = self._sort_column_name(text)
-        self.logger.debug(f"{field_name} get_text: {get_text}")
-
-
-        self.logger.debug(f"***** {field_name} 終了*****")
-
-        return get_text
 
 # ----------------------------------------------------------------------------------
-# URL部分の抽出
+# ブランド名 抽出
 
-    def get_url(self, url, field_name):
+    def get_brand_name(self):
+        get_brand_name = self._sort_column_name('ブランド名')
+        self.logger.debug(f"get_brand_name: {get_brand_name}")
 
-        self.logger.debug(f"***** {field_name} 開始*****")
-
-
-        get_url = self._sort_column_name(url)
-        self.logger.debug(f"{field_name} get_url: {get_url}")
+        return get_brand_name
 
 
-        self.logger.debug(f"***** {field_name} 終了*****")
+# ----------------------------------------------------------------------------------
+# URL 抽出
+
+    def get_url(self):
+        get_url = self._sort_column_name('DM送付コメント')
+        self.logger.debug(f"get_url: {get_url}")
 
         return get_url
 
-# ----------------------------------------------------------------------------------
-# 名前の抽出
-
-    def get_name(self, name, field_name):
-
-        self.logger.debug(f"***** {field_name} 開始*****")
-
-
-        get_name = self._sort_column_name(name)
-        self.logger.debug(f"{field_name} get_name: {get_name}")
-
-
-        self.logger.debug(f"***** {field_name} 終了*****")
-
-        return get_name
 
 # ----------------------------------------------------------------------------------

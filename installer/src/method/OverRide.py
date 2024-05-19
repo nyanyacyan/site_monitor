@@ -11,7 +11,7 @@ import os
 from .base.chrome import ChromeManager
 from .base.spreadsheet_read import SpreadsheetRead
 from .base.driverLogin import AutoLogin
-from .base.driver_control import Base
+from .base.driver_control import Operation
 from .base.df_Create import DataFlameCreate
 
 
@@ -57,8 +57,8 @@ class StartSpreadsheetRead(SpreadsheetRead):
 
 
 class OverAutoLogin(AutoLogin):
-    def __init__(self, chrome, discord_url, debug_mode=False):
-        super().__init__(chrome, discord_url, debug_mode)
+    def __init__(self, chrome, debug_mode=False):
+        super().__init__(chrome, debug_mode)
 
 
     def open_site(self, url):
@@ -72,7 +72,7 @@ class OverAutoLogin(AutoLogin):
 ####################################################################################
 
 
-class Drop(Base):
+class Drop(Operation):
     def __init__(self, chrome, discord_url, debug_mode=False):
         super().__init__(chrome, discord_url, debug_mode)
 

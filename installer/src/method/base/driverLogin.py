@@ -9,29 +9,28 @@ import time
 import requests
 from datetime import datetime
 
+
+
 from selenium.common.exceptions import (NoSuchElementException,
                                         WebDriverException,
                                         TimeoutException)
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 # 自作モジュール
 from .utils import Logger
-from .errorNotify import ErrorDiscord
+from .driver_utils import Wait
 
 # ----------------------------------------------------------------------------------
 ####################################################################################
 
 
 class AutoLogin:
-    def __init__(self, chrome, discord_url, debug_mode=False):
+    def __init__(self, chrome, debug_mode=False):
         self.chrome = chrome
-        self.discord_url = discord_url
 
         self.logger = self.setup_logger(debug_mode=debug_mode)
-
-        self.error_discord = ErrorDiscord(chrome=self.chrome, discord_url=self.discord_url)
+        self.driver_wait = Wait(chrome=self.chrome, debug_mode=debug_mode)
 
 
 
@@ -53,6 +52,7 @@ class AutoLogin:
 
         # サイトを開く前にurlを確認
         self.logger.debug(f"{field_name} url: {url}")
+        self.logger.debug(f"{field_name} by_pattern: {by_pattern} , check_path: {check_path}")
 
         self.logger.info("対象のサイトを開く")
 
@@ -63,7 +63,9 @@ class AutoLogin:
         try:
             print(f'by_pattern: {by_pattern}')
             self.logger.debug(f"IDなどを入力 ができるかを確認")
-            WebDriverWait(self.chrome, 10).until(EC.presence_of_element_located((self._locator_select(by_pattern), check_path)))
+
+            self.driver_wait._element_clickable(by_pattern=by_pattern, element_path=check_path, field_name=field_name)
+
             self.logger.debug(f"{field_name}  入力準備 完了")
 
         except TimeoutException as e:
@@ -72,36 +74,24 @@ class AutoLogin:
             self.chrome.refresh()
             try:
                 self.logger.debug(f"IDなどを入力 ができるかを確認")
-                WebDriverWait(self.chrome, 10).until(EC.presence_of_element_located((self._locator_select(by_pattern), check_path)))
+                self.driver_wait._element_clickable(by_pattern=by_pattern, element_path=check_path, field_name=field_name)
                 self.logger.debug(f"{field_name}  入力準備 完了")
 
             except TimeoutException as e:
                 self.logger.info(f"{field_name} 2回目のロードエラーのためタイムアウト: {e}")
-                self.error_discord.process(
-                    f"{field_name}: 2回目のロードエラーのためタイムアウト",
-                    str(e)
-                )
+
 
         except NoSuchElementException as e:
             self.logger.error(f" 要素が見つかりません: {by_pattern}: {check_path}, {e}")
-            self.error_discord.process(
-                f"{field_name}: 要素が見つかりません",
-                str(e)
-            )
+
 
         except WebDriverException as e:
             self.logger.error(f"{field_name} webdriverでのエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: webdriverでのエラーが発生",
-                str(e)
-            )
+
 
         except Exception as e:
             self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
+
 
         time.sleep(2)
 
@@ -142,9 +132,9 @@ class AutoLogin:
                 self.logger.debug(f"{field_name}: cookieを発見。")
 
                 # Cookieの中身をテキストに保存
-                self._save_cookies_to_text_file(cookies, full_path)
+                self._save_cookies_to_text_file(cookies=cookies, full_path=full_path, field_name=field_name)
                 # Cookieをバイナリデータにて保存
-                self._save_cookies_to_pickle_file(cookies, full_path)
+                self._save_cookies_to_pickle_file(cookies=cookies, full_path=full_path, field_name=field_name)
                 self.logger.debug(f"{field_name}: 保存完了")
 
             else:
@@ -152,10 +142,7 @@ class AutoLogin:
 
         except Exception as e:
             self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
+
 
 
 # ----------------------------------------------------------------------------------
@@ -194,16 +181,9 @@ class AutoLogin:
 
         except (IOError, OSError) as e:
             self.logger.error(f"ファイルの書き込み中にエラーが発生しました: {e}")
-            self.error_discord.process(
-                f"{field_name}: ファイルの書き込み中にエラーが発生しました",
-                str(e)
-            )
+
         except Exception as e:
             self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: 処理中にエラーが発生",
-                str(e)
-            )
 
 
 # ----------------------------------------------------------------------------------
@@ -225,44 +205,34 @@ class AutoLogin:
 
         except pickle.PicklingError as e:
             self.logger.error(f"{field_name}: クッキーのpickle化中にエラーが発生しました: {e}")
-            self.error_discord.process(
-                f"{field_name}: クッキーのpickle化中にエラーが発生しました",
-                str(e)
-            )
+
         except Exception as e:
             self.logger.error(f"{field_name}: 予期せぬエラーが発生しました: {e}")
-            self.error_discord.process(
-                f"{field_name}: 予期せぬエラーが発生しました",
-                str(e)
-            )
+
 
 # ----------------------------------------------------------------------------------
 # pickleデータを読み込む
 
-    def pickle_load(self, pickle_file_path, field_name) -> None:
+    def _pickle_load(self, pickle_file_path, field_name) -> None:
         try:
             # Cookieファイルを展開
             self.logger.debug(f"{field_name}:  Cookie 読み込み 開始")
             with open(pickle_file_path, 'rb') as file:
                 cookies = pickle.load(file)
-            self.logger.debug(f"{field_name}:  Cookie 読み込み 完了")
+            self.logger.debug(f"{field_name}: Cookie 読み込み 完了")
+            self.logger.debug(f"{field_name}: Cookie: {cookies}")
+
 
         except FileNotFoundError as e:
             self.logger.error(f"ファイルが見つかりません:{e}")
-            self.error_discord.process(
-                f"{field_name}: ファイルが見つかりません",
-                str(e)
-            )
+
 
             # エラーのためCookiesは空を渡す
             cookies = []
 
         except Exception as e:
             self.logger.error(f"{field_name}: 処理中にエラーが起きました:{e}")
-            self.error_discord.process(
-                f"{field_name}: ファイルが見つかりません",
-                str(e)
-            )
+
 
             # エラーのためCookiesは空を渡す
             cookies = []
@@ -273,18 +243,24 @@ class AutoLogin:
 # ----------------------------------------------------------------------------------
 # Cookieを使ってログイン
 
-    def cookie_login(self, main_url, pickle_file_path, field_name) -> None:
+    def cookie_login(self, main_url, file_name, field_name):
         # cookiesを初期化
         cookies = []
 
+        # Cookieのフルパス
+        pickle_file_path = self._get_full_path(file_name=file_name)
+
         # urlを事前確認
-        self.logger.info(f"{field_name}: main_url: {main_url}")
+        self.logger.debug(f"{field_name}: main_url: {main_url}")
 
         # Cookieファイルを展開
-        cookies = self.pickle_load(pickle_file_path)
+        cookies = self._pickle_load(pickle_file_path=pickle_file_path, field_name=field_name)
+
+        self.logger.debug(f"{field_name} cookies: {cookies}")
 
         self.chrome.get(main_url)
         self.logger.info(f"{field_name}: メイン画面にアクセス")
+
 
         # Cookieを設定
         for c in cookies:
@@ -293,24 +269,41 @@ class AutoLogin:
         self.chrome.get(main_url)
         self.logger.info(f"{field_name}: Cookieを使ってメイン画面にアクセス")
 
+        time.sleep(60)
 
-        if self.main_url != self.chrome.current_url:
+        current_url = self.chrome.current_url
+        self.logger.info(f"{field_name}: current_url: {current_url}")
+
+
+        if main_url == current_url:
             self.logger.info(f"{field_name}: Cookieでのログイン成功")
 
         else:
-            self.logger.info("Cookieでのログイン失敗 sessionでのログインに変更")
+            self.logger.warning("Cookieでのログイン失敗 sessionでのログインに変更")
             session = requests.Session()
 
+
+# セッションでのログイン
+# 項目はその時に応じて変更が必要
             for cookie in cookies:
                 session.cookies.set(cookie['name'], cookie['value'], domain=cookie['domain'])
 
-            response = session.get(self.main_url)
 
-            if self.main_url != self.chrome.current_url:
+            self.logger.debug(f"name{cookie['name']},{cookie['value']},{cookie['domain']}")
+
+            response = session.get(main_url)
+
+            print(f"status_code:{response.status_code} {response.text}")
+
+            time.sleep(60)
+
+
+            if main_url == self.chrome.current_url:
                 self.logger.info(f"{field_name}: sessionでのログイン成功")
 
             else:
                 self.logger.error(f"{field_name}: sessionでのログイン 失敗")
+                raise
 
             # テキスト化
             res_text = response.text
@@ -326,14 +319,128 @@ class AutoLogin:
 
         except Exception as e:
             self.logger.error(f"{field_name}: ログイン処理中 にエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: ファイルが見つかりません",
-                str(e)
-            )
+
 
 # ----------------------------------------------------------------------------------
+# サイトを閉じる
+
+    def close_chrome(self):
+        self.chrome.quit()
+
+
 # ----------------------------------------------------------------------------------
+# ログインできたかを確認する
+
+    def login_checker(self, timeout, by_pattern, xpath):
+        # サイトの状態がコンプリート状態になってるか確認
+        self.driver_wait._js_page_checker(timeout=timeout, field_name='login_checker')
+
+        # 指定の要素がDOM上に存在するまで待機
+        self.driver_wait._dom_checker(by_pattern=by_pattern, xpath=xpath, field_name='login_checker', timeout=timeout)
+
 # ----------------------------------------------------------------------------------
+# Cookieを使ってログイン
+
+    def cookie_login2(self, main_url, file_name, field_name):
+        # cookiesを初期化
+        cookies = []
+
+        # Cookieのフルパス
+        pickle_file_path = self._get_full_path(file_name=file_name)
+
+        # urlを事前確認
+        self.logger.debug(f"{field_name}: main_url: {main_url}")
+
+        # Cookieファイルを展開
+        cookies = self._pickle_load(pickle_file_path=pickle_file_path, field_name=field_name)
+
+        self.logger.debug(f"{field_name} cookies: {cookies}")
+
+        self.chrome.get(main_url)
+
+        for c in cookies:
+            self.chrome.add_cookie(c)
+
+        self.chrome.get(main_url)
+
+        time.sleep(60)
+
+        self.logger.info(f"{field_name}: Cookieを使ってメイン画面にアクセス")
+
+
+        current_url = self.chrome.current_url
+        self.logger.info(f"{field_name}: current_url: {current_url}")
+
+
+        if main_url == current_url:
+            self.logger.info(f"{field_name}: Cookieでのログイン成功")
+
+        else:
+            self.logger.warning("Cookieでのログイン失敗 sessionでのログインに変更")
+            session = requests.Session()
+
+
+# セッションでのログイン
+# 項目はその時に応じて変更が必要
+            cookie = cookies[0]
+            session.cookies.set(
+                name=cookie['name'],
+                value=cookie['value'],
+                domain=cookie['domain'],
+                path=cookie['path'],
+                # expires=cookie['expiry'],
+                # secure=cookie['secure'],
+                # rest={'HttpOnly': cookie['httpOnly'], 'SameSite': cookie['sameSite']}
+            )
+
+            self.logger.debug(f"name{cookie['name']},{cookie['value']},{cookie['domain']},{cookie['path']}")
+
+            response = session.get(main_url)
+
+            if main_url == self.chrome.current_url:
+                self.logger.info(f"{field_name}: sessionでのログイン成功")
+
+            else:
+                self.logger.error(f"{field_name}: sessionでのログイン 失敗")
+                raise
+
+            # テキスト化
+            res_text = response.text
+            self.logger.debug(f"res_text: {res_text}"[:30])
+
+
+        try:
+            # ログインした後のページ読み込みの完了確認
+            WebDriverWait(self.chrome, 5).until(
+            lambda driver: driver.execute_script('return document.readyState') == 'complete'
+            )
+            self.logger.debug(f"{field_name}: ログインページ読み込み 完了")
+
+        except Exception as e:
+            self.logger.error(f"{field_name}: ログイン処理中 にエラーが発生: {e}")
+
+
+# ----------------------------------------------------------------------------------
+
+
+    def switch_window(self, main_url):
+        self.logger.info(f"********** switch_window 開始 **********")
+        self.logger.debug(f"main_url: {main_url}")
+
+        try:
+            self.chrome.execute_script("window.open('');")
+            # ウィンドウハンドルの数をチェック
+            if len(self.chrome.window_handles) > 1:
+                self.chrome.switch_to.window(self.chrome.window_handles[1])
+                self.chrome.get(main_url)
+            else:
+                self.logger.error("2つ目のウィンドウが存在しません。")
+        except Exception as e:
+            self.logger.error(f"ウィンドウの切り替え中にエラーが発生しました: {e}")
+        finally:
+            self.logger.info("********** switch_window 終了 **********")
+
+
 # ----------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------

@@ -10,6 +10,8 @@ logs/
 
 *.json
 
+*.csv
+
 # 画像をアップロードしない
 *.jpeg
 *.png
@@ -25,6 +27,7 @@ logs/
 *.txt
 whisper_write_file.txt
 
+venv_shopers_scraping/
 
 # テストファイルを無視する。
 *test*
@@ -55,6 +58,8 @@ whisper_write_file.txt
 # 仮想環境
 venv/
 
+# 仮想環境を直接指定
+venv_site_monitor/
 
 # pickleデータ
 *.pkl
@@ -67,5 +72,9 @@ DebugScreenshot/
 __pycache__/
 *.pyc
 
-*.vscode
-.vscode
+データファイル
+const.py
+
+bin/
+
+*.DS_Store
