@@ -129,7 +129,7 @@ class SpreadsheetRead:
 # URL 抽出
 
     def get_url(self):
-        get_url = self._sort_column_name('DM送付コメント')
+        get_url = self._sort_column_name('サイトURL')
         self.logger.debug(f"get_url: {get_url}")
 
         return get_url

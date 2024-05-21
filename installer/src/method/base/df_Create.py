@@ -117,6 +117,9 @@ class DFCreate:
 #TODO: resultがNoneかどうかをチェックする
 
     def _sort_data(self, by_pattern, xpath, category_info, field_name):
+        '''
+        category_info カテゴリーごとの情報→今回は「category_name, catch_by, catch_path」この３つ
+        '''
         try:
             # 全体から対象のリストを取得
             item_boxs = self.chrome.find_elements(self._locator_select(by_pattern), xpath)
@@ -129,7 +132,10 @@ class DFCreate:
             for item_box in item_boxs:
                 # category_infoという得たデータから３つの情報を抜き取る
                 for category_name, catch_by, catch_path in category_info:
+
                     # もしcatch_pathがattributeだった場合にはその値を記す
+                    # .get_attribute は属性を取得するという意味
+                    # 文字列で属性値を取得するのではなく、属性値を取得するため
                     if catch_path == "attribute":
                         element_value = item_box.get_attribute(catch_path)
 
@@ -243,7 +249,7 @@ class DFCreate:
 # on=[key_column] ここで選択したcolumnを基準にして結合させる→同じものは行で結合
 # indicator=True これにより、dfに（‘left_only’、‘right_only’、‘both’）をステータスを追加
 # suffixes=(’_site’, ‘_csv’)同じcolumn名があった場合に左側と右側で追記するものを指定できる
-            result = pd.merge(key_df_reset, download_df_reset, on=[key_column], how='left', indicator=True, suffixes=('_site', '_csv'))
+            result = pd.merge(key_df_reset, download_df_reset, on=[key_column], how='left', indicator=True, suffixes=('_after', '_before'))
 
             self.logger.debug(f"{field_name} result: {result}")
             self.logger.debug(f"{field_name} result.columns: {result.columns}")

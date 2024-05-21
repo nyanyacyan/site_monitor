@@ -106,7 +106,21 @@ class Logger:
     def get_logger(self):
         return self.logger
 
-print(sys.path)
+
+# ----------------------------------------------------------------------------------
+
+# Loggerセットアップ
+
+    def setup_logger(self, debug_mode=False):
+        debug_mode = os.getenv('DEBUG_MODE', 'False') == 'True'
+        logger_instance = Logger(__name__, debug_mode=debug_mode)  # __name__はログにモジュール名を残す
+        return logger_instance.get_logger()
+
+
+# ----------------------------------------------------------------------------------
+
+# print(sys.path)
+
 
 
 ####################################################################################

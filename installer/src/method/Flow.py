@@ -8,24 +8,25 @@ import os, time
 
 
 # 自作モジュール
-from .OverRide import OverChrome, StartSpreadsheetRead, OverAutoLogin, Drop
+from .gss_login import OverChrome, StartSpreadsheetRead, OverAutoLogin, Drop
 from .base.utils import Logger
 # ----------------------------------------------------------------------------------
 ####################################################################################
 # 一連の流れ
 
 class Flow:
-    def __init__(self, brand_id, debug_mode=False):
-        self.brand_id = brand_id
+    def __init__(self, sheet_url, account_id, debug_mode=False):
+        self.sheet_url = sheet_url
 
         # インスタンス
         self.chrome.inst = OverChrome(debug_mode=debug_mode)
         self.chrome = self.chrome.inst
 
-        self.start_spreadsheet = StartSpreadsheetRead(brand_id=self.brand_id)
+        self.start_spreadsheet = StartSpreadsheetRead(sheet_url=sheet_url, account_id=account_id)
         self.auto_login = OverAutoLogin(chrome=self.chrome, debug_mode=debug_mode)
         self.drop_down = Drop(chrome=self.chrome, debug_mode=debug_mode)
         self.logger = self.setup_logger(debug_mode=debug_mode)
+
 
 ####################################################################################
 # ----------------------------------------------------------------------------------
@@ -80,7 +81,7 @@ class Flow:
 
 
 
-        self.logger.debug(f"***** {field_name} 開始*****")
+        self.logger.debug(f"***** {field_name} 終了*****")
 
 
 
