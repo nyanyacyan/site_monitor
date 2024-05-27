@@ -19,18 +19,7 @@ from .base.utils import Logger
 from dotenv import load_dotenv
 
 ####################################################################################
-# Chrome
 
-class OverChrome(ChromeManager):
-    def __init__(self, debug_mode=False):
-        super().__init__(debug_mode)
-
-
-    def setup_chrome(self) -> str:
-        return super().setup_chrome()
-
-
-####################################################################################
 # スプシから読み込み
 
 class StartSpreadsheetRead(SpreadsheetRead):
@@ -102,9 +91,8 @@ class GetData(DFCreate):
 
 
 class GssLogin:
-    def __init__(self, sheet_url, account_id, debug_mode=False) -> None:
-        self.chrome_inst = OverChrome(debug_mode=debug_mode)
-        self.chrome = self.chrome_inst
+    def __init__(self, sheet_url, account_id, chrome, debug_mode=False) -> None:
+        self.chrome = chrome
 
         self.setup_logger = Logger(__name__, debug_mode=debug_mode)
         self.logger = self.setup_logger.setup_logger()

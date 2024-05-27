@@ -19,7 +19,7 @@ from selenium.common.exceptions import (ElementNotInteractableException,
 
 # 自作モジュール
 from .utils import Logger
-from .errorNotify import ErrorDiscord
+# from .errorNotify import ErrorDiscord
 
 ####################################################################################
 # from driver_utils import Wait
@@ -31,7 +31,7 @@ class Wait:
         self.discord_url = discord_url
         self.logger = self.setup_logger(debug_mode=debug_mode)
 
-        self.error_discord = ErrorDiscord(chrome=self.chrome, discord_url=discord_url)
+        # self.error_discord = ErrorDiscord(chrome=self.chrome, discord_url=discord_url)
 
 ####################################################################################
 # Loggerセットアップ

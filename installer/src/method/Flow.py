@@ -1,4 +1,5 @@
 # coding: utf-8
+#! ここにChromeを展開する
 # ----------------------------------------------------------------------------------
 # 2023/4/17 更新
 
@@ -8,35 +9,34 @@ import os, time
 
 
 # 自作モジュール
-from .gss_login import OverChrome, StartSpreadsheetRead, OverAutoLogin, Drop
+from .base.chrome import ChromeManager
+from .gss_login import StartSpreadsheetRead, OverAutoLogin, Drop
 from .base.utils import Logger
 # ----------------------------------------------------------------------------------
-####################################################################################
+###############################################################
+
 # 一連の流れ
 
 class Flow:
     def __init__(self, sheet_url, account_id, debug_mode=False):
-        self.sheet_url = sheet_url
+        self.sheet_url = sheet_url(debug_mode=debug_mode)
+
+        # logger
+        self.setup_logger = Logger(__name__, debug_mode=debug_mode)
+
+        # Chrome
+        self.logger = self.setup_logger.setup_logger()
+        chrome_instance = ChromeManager()
+        self.chrome = chrome_instance.setup_chrome()
 
         # インスタンス
-        self.chrome.inst = OverChrome(debug_mode=debug_mode)
-        self.chrome = self.chrome.inst
-
         self.start_spreadsheet = StartSpreadsheetRead(sheet_url=sheet_url, account_id=account_id)
         self.auto_login = OverAutoLogin(chrome=self.chrome, debug_mode=debug_mode)
         self.drop_down = Drop(chrome=self.chrome, debug_mode=debug_mode)
-        self.logger = self.setup_logger(debug_mode=debug_mode)
 
 
-####################################################################################
-# ----------------------------------------------------------------------------------
 
-# Loggerセットアップ
-
-    def setup_logger(self, debug_mode=False):
-        debug_mode = os.getenv('DEBUG_MODE', 'False') == 'True'
-        logger_instance = Logger(__name__, debug_mode=debug_mode)
-        return logger_instance.get_logger()
+###############################################################
 
 
 # ----------------------------------------------------------------------------------
