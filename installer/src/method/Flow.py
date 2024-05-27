@@ -1,5 +1,6 @@
 # coding: utf-8
 #! ここにChromeを展開する
+#! なるべくここでは引数を渡さない
 # ----------------------------------------------------------------------------------
 # 2023/4/17 更新
 
@@ -19,7 +20,8 @@ from .base.utils import Logger
 
 class Flow:
     def __init__(self, sheet_url, account_id, debug_mode=False):
-        self.sheet_url = sheet_url(debug_mode=debug_mode)
+        self.sheet_url = sheet_url
+        self.account_id = account_id
 
         # logger
         self.setup_logger = Logger(__name__, debug_mode=debug_mode)
@@ -67,7 +69,7 @@ class Flow:
 
 
     def single_process(self, field_name='monitor_flow'):
-        self.logger.debug(f"***** {field_name} 開始*****")
+        self.logger.debug(f"***** {field_name} {self.account_id} 開始*****")
 
         brand_name = self.start_spreadsheet.get_brand_name()
         url = self.start_spreadsheet.get_url()
@@ -81,7 +83,7 @@ class Flow:
 
 
 
-        self.logger.debug(f"***** {field_name} 終了*****")
+        self.logger.debug(f"***** {field_name}  {self.account_id} 終了*****")
 
 
 
