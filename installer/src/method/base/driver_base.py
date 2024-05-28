@@ -19,21 +19,17 @@ from selenium.common.exceptions import (ElementNotInteractableException,
                                         TimeoutException)
 
 # 自作モジュール
-from lo import Logger
-from installer.src.method.base.errorNotify import ErrorDiscord
+from .utils import Logger
 
 
 # ----------------------------------------------------------------------------------
 
 
 class Base:
-    def __init__(self, chrome, discord_url, debug_mode=False):
+    def __init__(self, chrome, debug_mode=False):
         self.chrome = chrome
-        self.discord_url = discord_url
         self.logger = self.setup_logger(debug_mode=debug_mode)
 
-        # 自作モジュールインスタンス化
-        self.error_discord = ErrorDiscord(discord_url=self.discord_url)
 
 
 # ----------------------------------------------------------------------------------

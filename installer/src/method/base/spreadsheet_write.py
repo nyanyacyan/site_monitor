@@ -9,7 +9,7 @@ import gspread
 from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient import errors
-
+from gspread_dataframe import set_with_dataframe
 
 from dotenv import load_dotenv
 
@@ -132,32 +132,38 @@ class SpreadsheetWrite:
             c = ServiceAccountCredentials.from_json_keyfile_name(self.credentials_json_file, scope)
             gs = gspread.authorize(c)
 
+            # 指定のスプシへアクセス
             select_sheet = gs.open_by_key(self.spread_id).worksheet(worksheet)
 
             self.logger.debug(f"select_sheet: {select_sheet}")
 
-
-    # 指定のスプシへアクセス
+            # 指定したcolumnの値を入手
             col_row = select_sheet.col_values(col_left_num)
 
+            # Noneのcellを見つけたIndexを見つけてそのIndexを取得
             for i, cell in enumerate(col_row, start=start_row):
                 if cell == '':
-                    write_last_row = i
-            else:
-                write_last_row = len(col_row) + start_row
+                    none_cell_row = i
 
-            self.logger.debug(f"write_last_row: {write_last_row}")
+            # もしなにもなかったらスタートする行の次の行がスタート
+            else:
+                none_cell_row = len(col_row) + start_row
+
+            self.logger.debug(f"none_cell_row: {none_cell_row}")
 
             # Aが１になるように変更
             column = chr(64 + col_left_num)
 
-            cell_range = f"{column}{write_last_row}"
+            # 正しく変換したものを文字列に変換->「A21」みたいにする
+            cell_range = f"{column}{none_cell_row}"
 
+            # スプシに入力できる値に変換  スプシに値を入力する際にはリスト型
             input_list = [[value] for value in input_values]
 
             self.logger.debug(f"cell_range: {cell_range}")
             self.logger.debug(f"input_list: {input_list}")
 
+            # スプシ更新
             select_sheet.update(cell_range, input_list)
 
             self.logger.info(f"********** _column_none_cell 終了 **********")
@@ -166,7 +172,7 @@ class SpreadsheetWrite:
             self.logger.error(f"スプシ: 認証失敗{e}")
             raise
 
-        except gs.exceptions.APIError as e:
+        except gspread.exceptions.APIError as e:
             self.logger.error(f"スプシ: サーバーエラーのため実施不可{e}")
             raise
 
@@ -240,4 +246,75 @@ class SpreadsheetWrite:
 #TODO: 日付→リストにあるものをすべて表示
 #TODO: 4つ目以降のテーブルを実施
 #TODO: 
+
+
+
+# ----------------------------------------------------------------------------------
+# noneのcellを見つけて、そのcellの次の行から書き込む
+
+    def _gss_none_cell_next_row_df_write(self, worksheet, col_left_num, start_row, df):
+        self.logger.info(f"********** _gss_none_cell_next_row_df_write 開始 **********")
+
+        try:
+            self.logger.debug(f"self.spread_id: {self.spread_id}, start_row: {start_row}")
+
+            self.logger.debug(f"worksheet: {worksheet}, col_left_num: {col_left_num}, start_row: {start_row}")
+
+
+    # スプシへのアクセスを定義（API）
+            #* Scopeはこの場所で特定が必要
+            scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+            c = ServiceAccountCredentials.from_json_keyfile_name(self.credentials_json_file, scope)
+            gs = gspread.authorize(c)
+
+    # 指定のスプシへアクセス
+            select_sheet = gs.open_by_key(self.spread_id).worksheet(worksheet)
+
+            self.logger.debug(f"select_sheet: {select_sheet}")
+
+            self.logger.info(df.head())
+            self.logger.info(df.index)
+
+
+
+
+            # 特定のcolumnの値を入手
+            col_val = select_sheet.col_values(col_left_num)
+
+            self.logger.warning(f"col_val: {col_val}")
+
+
+            # noneのcellの次の行から書き込む
+            # Noneのcellを見つけたIndexを見つけてそのIndexを取得
+            for i, cell in enumerate(col_val, start=start_row):
+                if cell == '':
+                    none_cell_row = i
+                    none_cell_next = none_cell_row + 1
+            # もしなにもなかったらスタートする行の次の行がスタート
+            else:
+                none_cell_row = len(col_val) + start_row
+                none_cell_next = none_cell_row + 1
+
+            self.logger.debug(f"none_cell_next: {none_cell_next}")
+
+
+            # cellにDataFrameを書き込む
+            set_with_dataframe(select_sheet, df , row=none_cell_next, col=col_left_num)
+
+            self.logger.info(f"********** _gss_none_cell_next_row_df_write 終了 **********")
+
+        except errors.HttpError as e:
+            self.logger.error(f"スプシ: 認証失敗{e}")
+            raise
+
+        except gspread.exceptions.APIError as e:
+            self.logger.error(f"スプシ: サーバーエラーのため実施不可{e}")
+            raise
+
+        except Exception as e:
+            self.logger.error(f"スプシ: 処理中にエラーが発生{e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------
 

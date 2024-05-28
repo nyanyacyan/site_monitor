@@ -71,6 +71,10 @@ class Flow:
     def single_process(self, field_name='monitor_flow'):
         self.logger.debug(f"***** {field_name} {self.account_id} 開始*****")
 
+        self.logger.info(f"self.sheet_url: {self.sheet_url}")
+        self.logger.info(f"self.account_id: {self.account_id}")
+
+
         brand_name = self.start_spreadsheet.get_brand_name()
         url = self.start_spreadsheet.get_url()
 

@@ -35,15 +35,22 @@ class ChromeManager:
 # ----------------------------------------------------------------------------------
 # Chromeセットアップ（動かす箇所にしか配置しない）(要初期化)
 
-    def setup_chrome(self) -> str:
+    def setup_chrome(self):
         try:
             chrome_options = Options()
             # chrome_options.add_argument("--headless")  # ヘッドレスモードで実行
             chrome_options.add_argument(f"--window-position=0,0")
             chrome_options.add_argument("--window-size=1440,900")  # ウィンドウサイズの指定
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_extension(self._get_full_path('uBlock-Origin.crx'))  # iframe対策の広告ブロッカー
+            # chrome_options.add_argument("--no-sandbox")  # サンドボックスモード解除
+            # chrome_options.add_argument("--disable-dev-shm-usage")
+            chrome_options.add_experimental_option("prefs", {
+                "download.default_directory": "/method/input_data",
+                "download.prompt_for_download": False, # ダウンロード時の確認ダイアログを無効化
+                "download.directory_upgrade": True, # 自動ダウンロードを有効化
+                "safebrowsing.enabled": True, # セーフブラウジングを有効化（安全性の向上）
+                "safebrowsing.disable_download_protection": True # 安全ではないとされるファイルのダウンロード保護を無効化（注意）
+                }) # ファイルをダウンロードするときのパス
+            # chrome_options.add_extension(self._get_full_path('uBlock-Origin.crx'))  # iframe対策の広告ブロッカー
             # chrome_options.add_extension(self._get_full_path('hlifkpholllijblknnmbfagnkjneagid.crx'))  # CAPTCHA
 
 

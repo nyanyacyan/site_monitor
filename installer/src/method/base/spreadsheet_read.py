@@ -41,20 +41,28 @@ class SpreadsheetRead:
 # スプシ読み込みからpandasでの解析→文字列データを仮想的なファイルを作成
 
     def load_spreadsheet(self):
-        # スプシデータにアクセス
-        spreadsheet = requests.get(self.sheet_url)
+        try:
+            self.logger.info(f"******** {self.account_id} load_spreadsheet 開始********")
+            # スプシデータにアクセス
+            spreadsheet = requests.get(self.sheet_url)
 
-        # バイナリデータをutf-8に変換する
-        # on_bad_lines='skip'→パラメータに'skip'を指定することで、不正な形式スキップして表示できる（絵文字、特殊文字）
-        # StringIOは、文字列データをファイルのように扱えるようにするもの。メモリ上に仮想的なテキストファイルを作成する
-        # .set_index('account')これによってIndexを'account'に設定できる。
-        string_data = spreadsheet.content.decode('utf-8')
-        data_io = io.StringIO(string_data)
+            # バイナリデータをutf-8に変換する
+            # on_bad_lines='skip'→パラメータに'skip'を指定することで、不正な形式スキップして表示できる（絵文字、特殊文字）
+            # StringIOは、文字列データをファイルのように扱えるようにするもの。メモリ上に仮想的なテキストファイルを作成する
+            # .set_index('account')これによってIndexを'account'に設定できる。
+            string_data = spreadsheet.content.decode('utf-8')
+            data_io = io.StringIO(string_data)
 
-        df = pd.read_csv(data_io, on_bad_lines='skip')
+            df = pd.read_csv(data_io, on_bad_lines='skip')
 
-        # Indexを「account_id」にしたデータフレームを返してる
-        return df.set_index('アカウントNo.')
+            self.logger.info(f"******** {self.account_id} load_spreadsheet 開始********")
+
+            # Indexを「account_id」にしたデータフレームを返してる
+            return df.set_index('アカウントNo.')
+
+        except Exception as e:
+            self.logger.error(f"{self.account_id} load_spreadsheet 処理中にエラーが発生 {e}********")
+
 
 
 # ----------------------------------------------------------------------------------
@@ -113,26 +121,6 @@ class SpreadsheetRead:
         self.logger.debug(f"get_dm_text: {get_dm_text}")
 
         return get_dm_text
-
-
-# ----------------------------------------------------------------------------------
-# ブランド名 抽出
-
-    def get_brand_name(self):
-        get_brand_name = self._sort_column_name('ブランド名')
-        self.logger.debug(f"get_brand_name: {get_brand_name}")
-
-        return get_brand_name
-
-
-# ----------------------------------------------------------------------------------
-# URL 抽出
-
-    def get_url(self):
-        get_url = self._sort_column_name('サイトURL')
-        self.logger.debug(f"get_url: {get_url}")
-
-        return get_url
 
 
 # ----------------------------------------------------------------------------------

@@ -15,7 +15,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import (NoSuchElementException)
 
 # 自作モジュール
-# import const
+import const
 from .utils import Logger, NoneChecker
 from .spreadsheet_write import SpreadsheetWrite
 
@@ -117,9 +117,6 @@ class DFCreate:
 #TODO: resultがNoneかどうかをチェックする
 
     def _sort_data(self, by_pattern, xpath, category_info, field_name):
-        '''
-        category_info カテゴリーごとの情報→今回は「category_name, catch_by, catch_path」この３つ
-        '''
         try:
             # 全体から対象のリストを取得
             item_boxs = self.chrome.find_elements(self._locator_select(by_pattern), xpath)
@@ -132,10 +129,7 @@ class DFCreate:
             for item_box in item_boxs:
                 # category_infoという得たデータから３つの情報を抜き取る
                 for category_name, catch_by, catch_path in category_info:
-
                     # もしcatch_pathがattributeだった場合にはその値を記す
-                    # .get_attribute は属性を取得するという意味
-                    # 文字列で属性値を取得するのではなく、属性値を取得するため
                     if catch_path == "attribute":
                         element_value = item_box.get_attribute(catch_path)
 
@@ -249,7 +243,7 @@ class DFCreate:
 # on=[key_column] ここで選択したcolumnを基準にして結合させる→同じものは行で結合
 # indicator=True これにより、dfに（‘left_only’、‘right_only’、‘both’）をステータスを追加
 # suffixes=(’_site’, ‘_csv’)同じcolumn名があった場合に左側と右側で追記するものを指定できる
-            result = pd.merge(key_df_reset, download_df_reset, on=[key_column], how='left', indicator=True, suffixes=('_after', '_before'))
+            result = pd.merge(key_df_reset, download_df_reset, on=[key_column], how='left', indicator=True, suffixes=('_site', '_csv'))
 
             self.logger.debug(f"{field_name} result: {result}")
             self.logger.debug(f"{field_name} result.columns: {result.columns}")
@@ -675,84 +669,94 @@ class DFCreate:
 
     def _get_table_to_df(self, start_num, end_num, header_additions, select_headers):
         self.logger.info(f"********** _get_table 開始 **********")
+        try:
+            self.logger.info(f"start_num: {start_num}, end_num: {end_num}")
 
-# 全てのテーブルか、必要なテーブルを選択
-        select_tables = self.chrome.find_elements(By.TAG_NAME, 'table')[start_num: end_num]
-        table_count = len(select_tables)
+            current_url = self.chrome.current_url
+            self.logger.info(f"current_url: {current_url}")
 
-        self.logger.debug(f"start_num: {start_num}, end_num: {end_num}")
-        self.logger.debug(f"table_count: {table_count}, select_tables: {select_tables}")
+    # 全てのテーブルか、必要なテーブルを選択
+            select_tables = self.chrome.find_elements(By.TAG_NAME, 'table')[start_num: end_num]
+            table_count = len(select_tables)
 
-        all_data_frames = []  # 一つ一つのテーブルのdfを格納
+            self.logger.warning(f"table_count: {table_count}, select_tables: {select_tables}")
 
-        for index, table in enumerate(select_tables):
-            self.logger.debug(f"処理中の table 番号 {index}")
+            all_data_frames = []  # 一つ一つのテーブルのdfを格納
 
-            table_data = []
+            for index, table in enumerate(select_tables):
+                self.logger.debug(f"処理中の table 番号 {index}")
 
-            headers = [th.text for th in table.find_elements(By.TAG_NAME, 'tr')[0].find_elements(By.TAG_NAME, 'th')]
-            self.logger.debug(f"Original headers: {headers}")
+                table_data = []
 
-            if index in header_additions:
-                self.logger.debug(f"Applying additions for index {index}")
-                headers = [
-                    f"{header_additions[index]} {header}" if header in select_headers else header
-                    for header in headers
-                ]
+                headers = [th.text for th in table.find_elements(By.TAG_NAME, 'tr')[0].find_elements(By.TAG_NAME, 'th')]
+                self.logger.debug(f"Original headers: {headers}")
 
-            # table_data.append(headers)
-            self.logger.debug(f"headers: {headers}")
+                if index in header_additions:
+                    self.logger.debug(f"Applying additions for index {index}")
+                    headers = [
+                        f"{header_additions[index]} {header}" if header in select_headers else header
+                        for header in headers
+                    ]
 
-            # trを取得→テーブルの大枠
-            rows = table.find_elements(By.TAG_NAME, 'tr')
-            self.logger.debug(f"rows: {rows}")
+                # table_data.append(headers)
+                self.logger.debug(f"headers: {headers}")
 
-            # テーブルの各行（td）を取得
-            for row in rows:
-                cols = row.find_elements(By.TAG_NAME, 'td')
-                col_data = [col.text for col in cols]
+                # trを取得→テーブルの大枠
+                rows = table.find_elements(By.TAG_NAME, 'tr')
+                self.logger.debug(f"rows: {rows}")
 
-                self.logger.debug(f"col_data: {col_data}")
+                # テーブルの各行（td）を取得
+                for row in rows:
+                    cols = row.find_elements(By.TAG_NAME, 'td')
+                    col_data = [col.text for col in cols]
 
-                if col_data:
-                    table_data.append(col_data)
+                    self.logger.debug(f"col_data: {col_data}")
 
-            if table_data:
-                df = pd.DataFrame(table_data, columns=headers)
-                all_data_frames.append(df)
+                    if col_data:
+                        table_data.append(col_data)
 
-            for column in df.columns:
-                if column != 'Date':
-                    df[column] = pd.to_numeric(df[column], errors='coerce')
+                if table_data:
+                    df = pd.DataFrame(table_data, columns=headers)
+                    all_data_frames.append(df)
+
+                    for column in df.columns:
+                        if column != 'Date':
+                            df[column] = pd.to_numeric(df[column], errors='coerce')
+
+                else:
+                    self.logger.error(f"table_dataがない {table_data}")
 
 
-        if all_data_frames:
+            if all_data_frames:
 
-            combined_df = reduce(
-                lambda left, right: pd.merge(left, right, on='Date', how='outer', suffixes=('_1', '_2')),
-                all_data_frames
-            )
-        else:
-            self.logger.error(f"all_data_framesが存在しません: \n{all_data_frames}")
+                combined_df = reduce(
+                    lambda left, right: pd.merge(left, right, on='Date', how='outer', suffixes=('_1', '_2')),
+                    all_data_frames
+                )
+            else:
+                self.logger.error(f"all_data_framesが存在しません: \n{all_data_frames}")
 
-# 'Date' 列を datetime 型に変換
-        combined_df['Date'] = pd.to_datetime(combined_df['Date']).dt.date
+    # 'Date' 列を datetime 型に変換
+            combined_df['Date'] = pd.to_datetime(combined_df['Date']).dt.date
 
-# 'Date' 列をインデックスとして設定
-        # combined_df.set_index('Date', inplace=True)
+    # 'Date' 列をインデックスとして設定
+            # combined_df.set_index('Date', inplace=True)
 
-# 'Date' 列に基づいてデータフレームを昇順にソート
-        combined_df = combined_df.sort_values(by='Date')
+    # 'Date' 列に基づいてデータフレームを昇順にソート
+            combined_df = combined_df.sort_values(by='Date')
 
-        self.logger.debug(f"combined_df: {combined_df}")
-        self.logger.debug(f"Combined DataFrame shape: {combined_df.shape}")
+            self.logger.debug(f"combined_df: {combined_df}")
+            self.logger.debug(f"Combined DataFrame shape: {combined_df.shape}")
 
-        # combined_df.to_csv('check_file.csv')
-        self.logger.info(f"********** _get_table 終了 **********")
+            # combined_df.to_csv('check_file.csv')
+            self.logger.info(f"********** _get_table 終了 **********")
 
-# サイトから得たテーブルをきれいに並び替えたDF
-        return combined_df
+    # サイトから得たテーブルをきれいに並び替えたDF
+            return combined_df
 
+        except Exception as e:
+            self.logger.error(f"処理中にエラーが発生: {e}", exc_info=True)
+            return pd.DataFrame()
 
 # ----------------------------------------------------------------------------------
 
@@ -1183,7 +1187,8 @@ class DFCreate:
                 self.logger.error(f"df_gss_write_result_base_data 処理中にエラーが発生: {e}")
 
 
-# ----------------------------------------------------------------------------------# result_error スプシ書き込み
+# ----------------------------------------------------------------------------------
+# result_error スプシ書き込み
 
     def df_gss_write_result_error(self, worksheet, input_values):
         self.logger.info(f"********** df_gss_write_result_base_data 開始 **********")
@@ -1247,6 +1252,26 @@ class DFCreate:
         except Exception as e:
                 self.logger.error(f"gss_input_flow  処理中にエラーが発生: {e}")
                 raise
+
+
+# ----------------------------------------------------------------------------------
+# result_unmatched_data スプシ書き込み
+
+    def df_gss_write(self, worksheet, input_values):
+        self.logger.info(f"********** df_gss_write_result_unmatched_data 開始 **********")
+
+        try:
+            self.spread_input._gss_none_cell_next_row_df_write(
+                worksheet = worksheet,
+                col_left_num = 4,
+                start_row = 1,
+                input_values = input_values
+            )
+
+            self.logger.info(f"********** df_gss_write_result_unmatched_data 終了 **********")
+
+        except Exception as e:
+                self.logger.error(f"df_gss_write_result_unmatched_data 処理中にエラーが発生: {e}")
 
 
 # ----------------------------------------------------------------------------------
