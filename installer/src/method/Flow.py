@@ -71,7 +71,7 @@ class Flow:
     def single_process(self, field_name='monitor_flow'):
         self.logger.debug(f"***** {field_name} {self.account_id} 開始*****")
 
-#TODO ここからの流れを別で定義してリトライができるようにする
+#TODO ここからの流れをgss_loginにて定義してリトライができるようにする
         self.logger.info(f"self.sheet_url: {self.sheet_url}")
         self.logger.info(f"self.account_id: {self.account_id}")
 
