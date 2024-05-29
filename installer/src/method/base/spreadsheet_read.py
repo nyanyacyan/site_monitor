@@ -20,23 +20,17 @@ class SpreadsheetRead:
     def __init__(self, sheet_url, account_id, debug_mode=False):
         self.sheet_url = sheet_url
         self.account_id = account_id
-        self.logger = self.setup_logger(debug_mode=debug_mode)
+
+        # logger
+        self.setup_logger = Logger(__name__, debug_mode=debug_mode)
+        self.logger = self.setup_logger.setup_logger()
+
         self.none = NoneChecker()
 
         self.df = self.load_spreadsheet()
 
 
 ####################################################################################
-# ----------------------------------------------------------------------------------
-
-# Loggerセットアップ
-
-    def setup_logger(self, debug_mode=False):
-        debug_mode = os.getenv('DEBUG_MODE', 'False') == 'True'
-        logger_instance = Logger(__name__, debug_mode=debug_mode)
-        return logger_instance.get_logger()
-
-
 # ----------------------------------------------------------------------------------
 # スプシ読み込みからpandasでの解析→文字列データを仮想的なファイルを作成
 
@@ -55,11 +49,13 @@ class SpreadsheetRead:
 
             df = pd.read_csv(data_io, on_bad_lines='skip')
 
+            self.logger.info(df.head(3))
+            self.logger.info(df.columns)
+
             self.logger.info(f"******** {self.account_id} load_spreadsheet 開始********")
 
             # Indexを「account_id」にしたデータフレームを返してる
-            return df.set_index('アカウントNo.')
-
+            return df.set_index('ID')
         except Exception as e:
             self.logger.error(f"{self.account_id} load_spreadsheet 処理中にエラーが発生 {e}********")
 
@@ -121,6 +117,26 @@ class SpreadsheetRead:
         self.logger.debug(f"get_dm_text: {get_dm_text}")
 
         return get_dm_text
+
+
+# ----------------------------------------------------------------------------------
+# ブランド名の抽出
+
+    def get_brand_name(self):
+        get_brand_name = self._sort_column_name('brand_name')
+        self.logger.debug(f"get_brand_name: {get_brand_name}")
+
+        return get_brand_name
+
+
+# ----------------------------------------------------------------------------------
+# URLの抽出
+
+    def get_url(self):
+        get_url = self._sort_column_name('サイトURL')
+        self.logger.debug(f"get_url: {get_url}")
+
+        return get_url
 
 
 # ----------------------------------------------------------------------------------

@@ -25,9 +25,9 @@ class Flow:
 
         # logger
         self.setup_logger = Logger(__name__, debug_mode=debug_mode)
+        self.logger = self.setup_logger.setup_logger()
 
         # Chrome
-        self.logger = self.setup_logger.setup_logger()
         chrome_instance = ChromeManager()
         self.chrome = chrome_instance.setup_chrome()
 
@@ -71,16 +71,14 @@ class Flow:
     def single_process(self, field_name='monitor_flow'):
         self.logger.debug(f"***** {field_name} {self.account_id} 開始*****")
 
+#TODO ここからの流れを別で定義してリトライができるようにする
         self.logger.info(f"self.sheet_url: {self.sheet_url}")
         self.logger.info(f"self.account_id: {self.account_id}")
-
 
         brand_name = self.start_spreadsheet.get_brand_name()
         url = self.start_spreadsheet.get_url()
 
         self.logger.info(f"brand_name: {brand_name}, url: {url}")
-
-
         self.auto_login.open_site(url=url)
 
 
