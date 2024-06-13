@@ -5,8 +5,8 @@
 # ----------------------------------------------------------------------------------
 import os
 
-from .utils import Logger
-from .errorNotify import ErrorDiscord
+from installer.src.method.DebugScreenshot.utils import Logger
+from installer.src.method.base.errorNotify import ErrorDiscord
 
 
 ####################################################################################

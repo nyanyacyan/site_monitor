@@ -81,7 +81,11 @@ class Flow:
         self.logger.info(f"brand_name: {brand_name}, url: {url}")
         self.auto_login.open_site(url=url)
 
-
+#todo 商品のリスト読み込む
+# ブランド名（各メソッドに埋め込めるようにする）
+# ジャンル
+# 商品状態
+# DataFrameにして比較できるようにする
 
 
 

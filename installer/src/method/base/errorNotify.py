@@ -7,7 +7,7 @@ import os,requests
 from datetime import datetime
 
 # 自作モジュール
-from .utils import Logger
+from installer.src.method.DebugScreenshot.utils import Logger
 
 
 # ----------------------------------------------------------------------------------

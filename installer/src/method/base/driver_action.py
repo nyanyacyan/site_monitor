@@ -27,21 +27,16 @@ from .driver_utils import Wait
 class Action:
     def __init__(self, chrome, debug_mode=False):
         self.chrome = chrome
-        self.logger = self.setup_logger(debug_mode=debug_mode)
+
+        # logger
+        self.setup_logger = Logger(__name__, debug_mode=debug_mode)
+        self.logger = self.setup_logger.setup_logger()
+
         self.none = NoneChecker(debug_mode=debug_mode)
         self.driver_wait = Wait(chrome=self.chrome, debug_mode=debug_mode)
 
 
 ####################################################################################
-# ----------------------------------------------------------------------------------
-# Loggerセットアップ
-
-    def setup_logger(self, debug_mode=False):
-        debug_mode = os.getenv('DEBUG_MODE', 'False') == 'True'
-        logger_instance = Logger(__name__, debug_mode=debug_mode)
-        return logger_instance.get_logger()
-
-
 # ----------------------------------------------------------------------------------
 # 移動してクリックするアクション
 

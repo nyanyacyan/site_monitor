@@ -1,8 +1,5 @@
 # coding: utf-8
 # ----------------------------------------------------------------------------------
-# loggerクラス
-# 2023/2/18 制作
-
 
 #* 文字列処理
 # ユーザー入力のサニタイズ
@@ -32,6 +29,8 @@
 # HTTPリクエストの送受信
 # URLの組み立てや解析
 # データエンコーディングやデコーディング
+
+
 # ----------------------------------------------------------------------------------
 import logging
 import os
@@ -107,20 +106,21 @@ class Logger:
     def get_logger(self):
         return self.logger
 
+
 # ----------------------------------------------------------------------------------
+
 # Loggerセットアップ
 
     def setup_logger(self, debug_mode=False):
         debug_mode = os.getenv('DEBUG_MODE', 'False') == 'True'
-        logger_instance = Logger(__name__, debug_mode=debug_mode)
+        logger_instance = Logger(__name__, debug_mode=debug_mode)  # __name__はログにモジュール名を残す
         return logger_instance.get_logger()
 
 
 # ----------------------------------------------------------------------------------
 
+# print(sys.path)
 
-
-print(sys.path)
 
 
 ####################################################################################

@@ -20,29 +20,27 @@ from selenium.common.exceptions import (ElementNotInteractableException,
 
 # 自作モジュール
 from .utils import Logger
+from installer.src.method.base.errorNotify import ErrorDiscord
 
 
 # ----------------------------------------------------------------------------------
 
 
 class Base:
-    def __init__(self, chrome, debug_mode=False):
+    def __init__(self, chrome, discord_url, debug_mode=False):
+        # logger
+        self.setup_logger = Logger(__name__, debug_mode=debug_mode)
+        self.logger = self.setup_logger.setup_logger()
+
         self.chrome = chrome
+        self.discord_url = discord_url
         self.logger = self.setup_logger(debug_mode=debug_mode)
 
+        # 自作モジュールインスタンス化
+        self.error_discord = ErrorDiscord(discord_url=self.discord_url)
 
 
 # ----------------------------------------------------------------------------------
-# Loggerセットアップ
-
-    def setup_logger(self, debug_mode=False):
-        debug_mode = os.getenv('DEBUG_MODE', 'False') == 'True'
-        logger_instance = Logger(__name__, debug_mode=debug_mode)
-        return logger_instance.get_logger()
-
-
-# ----------------------------------------------------------------------------------
-
 # 要素を探して入力
 
     def input_write(self, xpath, input_value, field_name):
