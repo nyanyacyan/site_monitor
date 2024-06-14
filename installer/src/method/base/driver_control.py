@@ -32,13 +32,13 @@ from .driver_utils import Wait
 
 class Operation:
     def __init__(self, chrome, debug_mode=False):
+        # chrome
+        self.chrome = chrome
+
         # logger
         self.setup_logger = Logger(__name__, debug_mode=debug_mode)
         self.logger = self.setup_logger.setup_logger()
 
-        self.chrome = chrome
-
-        self.none = NoneChecker(debug_mode=debug_mode)
         self.driver_wait = Wait(chrome=self.chrome, debug_mode=debug_mode)
 
 

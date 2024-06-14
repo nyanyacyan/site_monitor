@@ -44,6 +44,7 @@ class Flow:
         self.drop_down = Drop(chrome=self.chrome, debug_mode=debug_mode)
         self.get_element = GetElement(chrome=self.chrome, debug_mode=debug_mode)
         self.pickle = PickleControl(chrome=self.chrome, debug_mode=debug_mode)
+        self.df_create = 
 
         # 現時刻を掲載
         self.current_date = datetime.now().strftime('%m-%d %H:%M')

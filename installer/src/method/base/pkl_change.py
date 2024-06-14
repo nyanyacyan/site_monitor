@@ -4,22 +4,12 @@
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-import os
-import glob
 import pickle
-import zipfile
-import const
 import pandas as pd
-from pathlib import Path
-import shutil
-from functools import reduce
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import (NoSuchElementException)
 
 # 自作モジュール
 # import const
-from .utils import Logger, NoneChecker
-from .spreadsheet_write import SpreadsheetWrite
+from .utils import Logger
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

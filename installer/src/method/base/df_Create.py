@@ -1220,7 +1220,7 @@ class DFCreate:
 # ----------------------------------------------------------------------------------
 # ２つのDataFrameの行単位での差分を出す
 
-    def df_row_diff_value(self, current_df, old_df, head_num, diff_parts):
+    def df_row_diff_value(self, current_df, old_df, head_num, select_column):
         try:
             self.logger.info(f"********** df_row_diff_value start **********")
 
@@ -1232,7 +1232,7 @@ class DFCreate:
             self.logger.debug(f"extract_old_df:\n{extract_old_df.head(3)}")
 
             # extract_current_dfに存在しないデータの行データを取得
-            diff_row_df = extract_current_df[~extract_current_df[diff_parts].isin(extract_old_df[diff_parts])]
+            diff_row_df = extract_current_df[~extract_current_df[select_column].isin(extract_old_df[select_column])]
 
             # もしDataFrameにデータがあった場合に
             if not diff_row_df.empty:
