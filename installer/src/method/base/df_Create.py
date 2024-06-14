@@ -5,6 +5,7 @@
 # ----------------------------------------------------------------------------------
 import os
 import glob
+import time
 import pickle
 import zipfile
 import const
@@ -1251,5 +1252,29 @@ class DFCreate:
         except Exception as e:
                 self.logger.error(f"df_row_diff_value  処理中にエラーが発生: {e}")
                 raise
+
+# ----------------------------------------------------------------------------------
+# 返ってくる値によって実行処理を変更する
+
+    def is_result_branch(self, diff_row_df, notify_func, save_func):
+        try:
+            self.logger.info(f"********** result_process start **********")
+
+            if diff_row_df:
+                self.logger.debug(f"diff_row_df:\n{diff_row_df.head(3)}")
+                notify_func(diff_row_df)
+                time.sleep(2)
+                save_func()
+
+            else:
+                save_func()
+
+            self.logger.info(f"********** result_process end **********")
+
+
+        except Exception as e:
+                self.logger.error(f"result_process  処理中にエラーが発生: {e}")
+                raise
+
 
 # ----------------------------------------------------------------------------------
