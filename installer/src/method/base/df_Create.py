@@ -152,64 +152,6 @@ class DFCreate:
 
 
 # ----------------------------------------------------------------------------------
-# pickleデータを通常のデータへ変換
-
-    def _pkl_to_utf8(self, pkl_file, field_name):
-        try:
-            if pkl_file:
-                with open(pkl_file, 'rb') as f:
-                    binary_data = f.read()
-
-                    text_data = binary_data.decode('utf-8')
-
-                    self.logger.debug(f"{field_name} text_data: {text_data}")
-
-                    return text_data
-
-            else:
-                self.logger.warning(f"pickle が存在しない: {pkl_file}")
-                raise FileNotFoundError(f"{field_name} {pkl_file}が見つまりません{e}")
-
-        except FileNotFoundError as e:
-            self.logger.error(f"{field_name} {pkl_file}が見つまりません{e}")
-            raise
-
-        except UnicodeDecodeError as e:  # デコードエラーの処理
-            self.logger.error(f"{field_name} {pkl_file}のデコード中にエラーが発生: {e}")
-            raise
-
-        except Exception as e:
-            self.logger.error(f"{field_name} {pkl_file} pickleデータを変換中にエラーが発生{e}")
-            raise
-
-
-# ----------------------------------------------------------------------------------
-# pickleデータへの変換
-
-    def _to_pkl(self, new_data, fullpath, field_name='_to_pkl'):
-        try:
-            with open(f'{fullpath}.pkl', 'wb') as f:
-                binary_data = pickle.dump(new_data, f)
-
-                # Noneかどうかを確認
-                self.none_checker.any_checker(result=binary_data)
-
-                self.logger.debug(f"{field_name} {new_data}からバイナリデータへの書き込みが完了")
-
-        except IOError as e:  # IOErrorを捕捉（ファイル関連のエラー）
-            self.logger.error(f"{field_name} ファイル操作中にエラーが発生 {e}")
-            raise
-
-        except pickle.PickleError as e:  # pickleのエラーを捕捉
-            self.logger.error(f"{field_name} データのpickle化中にエラーが発生 {e}")
-            raise
-
-        except Exception as e:
-            self.logger.error(f"{field_name} {new_data} pickleデータを変換中にエラーが発生{e}")
-            raise
-
-
-# ----------------------------------------------------------------------------------
 #TODO: resultがNoneかどうかをチェックする
 
     def diff_data_list_create(self, key_df, download_df, key_column, field_name):

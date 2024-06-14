@@ -99,13 +99,16 @@ class PickleControl:
 
     def _pickle_df(self, pkl_data, output_path):
         try:
-            self.logger.info(f"******** google_map_api_request start ********")
+            self.logger.info(f"******** _pickle_df start ********")
 
             self.logger.debug(f"pkl_data: {pkl_data}")
 
             self.logger.debug(f"output_path: {output_path}")
 
-            self.logger.info(f"******** google_map_api_request start ********")
+
+
+
+            self.logger.info(f"******** _pickle_df start ********")
 
         except Exception as e:
             self.logger.error(f"pickleデータを変換中にエラーが発生{e}")

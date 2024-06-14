@@ -17,7 +17,7 @@ from .base.chrome import ChromeManager
 from .gss_login import StartSpreadsheetRead, OverAutoLogin, Drop
 from .base.utils import Logger
 from .base.driver_get_element import GetElement
-from .base.pkl import pickle
+from .base.pkl import PickleControl
 
 
 # ----------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ class Flow:
         self.auto_login = OverAutoLogin(chrome=self.chrome, debug_mode=debug_mode)
         self.drop_down = Drop(chrome=self.chrome, debug_mode=debug_mode)
         self.get_element = GetElement(chrome=self.chrome, debug_mode=debug_mode)
-        self.pickle = pickle(chrome=self.chrome, debug_mode=debug_mode)
+        self.pickle = PickleControl(chrome=self.chrome, debug_mode=debug_mode)
 
         # 現時刻を掲載
         self.current_date = datetime.now().strftime('%m-%d %H:%M')
@@ -96,35 +96,35 @@ class Flow:
         time.sleep(2)
 
         # DataFrameにして比較できるようにする
-        df = pd.DataFrame(dict_data)
-        self.logger.info(f"df: \n{df.head(5)}")
-
-        # df.to_csv(f'installer/result_output/{self.account_id}_{self.current_date}.csv')
-
+        current_df = pd.DataFrame(dict_data)
+        self.logger.info(f"current_df: \n{current_df.head(5)}")
 
 
         #todo 過去のバイナリデータを読み込む
         # バイナリデータを読み込むクラスを作成
         # バイナリデータをdfにして比較できるようにする
-        self.pickle
+        before_data = self.pickle._pkl_to_utf8(
             pkl_file=f'installer/result_output/pickles/{self.account_id}.pkl',
             field_name='_pkl_to_utf8'
         )
 
-
-
+        before_df = pd.DataFrame(before_data)
+        self.logger.debug(f"before_df:\n{before_df.head(3)}")
 
 
         #todo 比較して「過去のデータにない商品」を真偽値で示す
-        # 真偽値にてFalseだった場合には処理を終了
+        #TODO 今のDataFrameと前のDataFrameの違いを出すメソッドを作成する→どんなものが来てもできるようにする
+
 
         #todo 比較して「過去のデータにない商品」をピックアップする
 
+
+        #TODO 真偽値にてFalseだった場合には通知する
+
+
         #todo 最新のデータをバイナリデータで保存
-        self.df_create._to_pkl(
-            new_data=df,
-            fullpath=''
-        )
+        current_df.to_pickle(f'installer/result_output/pickles/{self.account_id}.pkl')
+
 
 
         #todo 新着商品がある場合に通知
