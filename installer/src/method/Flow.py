@@ -17,6 +17,7 @@ from .base.chrome import ChromeManager
 from .gss_login import StartSpreadsheetRead, OverAutoLogin, Drop
 from .base.utils import Logger
 from .base.driver_get_element import GetElement
+from .base.df_Create import DFCreate
 
 
 # ----------------------------------------------------------------------------------
@@ -42,7 +43,9 @@ class Flow:
         self.auto_login = OverAutoLogin(chrome=self.chrome, debug_mode=debug_mode)
         self.drop_down = Drop(chrome=self.chrome, debug_mode=debug_mode)
         self.get_element = GetElement(chrome=self.chrome, debug_mode=debug_mode)
+        DFCreate(chrome=self.chrome, debug_mode=debug_mode)
 
+        # 現時刻を掲載
         self.current_date = datetime.now().strftime('%m-%d %H:%M')
 
 
