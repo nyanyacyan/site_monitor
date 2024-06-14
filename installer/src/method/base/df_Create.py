@@ -258,6 +258,31 @@ class DFCreate:
 
 
 # ----------------------------------------------------------------------------------
+# DataFrameのIndexを変更する
+
+    def _df_change_index(self, df, change_column):
+        try:
+            self.logger.info(f"********** _df_change_index start **********")
+
+            if change_column:
+                df.set_index(change_column, inplace=True)
+
+                self.logger.debug(f"DataFrameのIndexを {change_column} に変更")
+
+            else:
+                raise ValueError(f'{change_column} is None')
+
+            self.logger.info(f"********** _df_change_index end **********")
+
+            return df
+
+        except ValueError as ve:
+            self.logger.error(f"{change_column} is None: {ve}")
+
+        except Exception as e:
+            self.logger.error(f"_df_change_index: 処理中にエラーが発生: {e}")
+
+# ----------------------------------------------------------------------------------
 # dfのセルからdfを作成（辞書データ）
 
     def _cell_to_df(self, df, column_name):
@@ -1190,5 +1215,41 @@ class DFCreate:
                 self.logger.error(f"gss_input_flow  処理中にエラーが発生: {e}")
                 raise
 
+
+# ----------------------------------------------------------------------------------
+# ２つのDataFrameの行単位での差分を出す
+
+    def df_row_diff_value(self, current_df, old_df, head_num, diff_parts):
+        try:
+            self.logger.info(f"********** df_row_diff_value start **********")
+
+            # DataFrameの比較する対象範囲を決める
+            extract_current_df = current_df.head(head_num)
+            extract_old_df = old_df.head(head_num)
+
+            self.logger.debug(f"extract_current_df:\n{extract_current_df.head(3)}")
+            self.logger.debug(f"extract_old_df:\n{extract_old_df.head(3)}")
+
+            # extract_current_dfに存在しないデータの行データを取得
+            diff_row_df = extract_current_df[~extract_current_df[diff_parts].isin(extract_old_df[diff_parts])]
+
+            # もしDataFrameにデータがあった場合に
+            if not diff_row_df.empty:
+                self.logger.debug(f"diff_row_data:\n{diff_row_df.head(3)}")
+                self.logger.info(f"********** df_row_diff_value end **********")
+
+                return diff_row_df
+
+            # 新しいデータなし
+            else:
+                self.logger.info('新しいデータ、なし')
+                self.logger.info(f"********** df_row_diff_value end **********")
+
+                return None
+
+
+        except Exception as e:
+                self.logger.error(f"df_row_diff_value  処理中にエラーが発生: {e}")
+                raise
 
 # ----------------------------------------------------------------------------------

@@ -97,21 +97,32 @@ class PickleControl:
 # ----------------------------------------------------------------------------------
 # pickleデータからDataFrameに変換
 
-    def _pickle_df(self, pkl_data, output_path):
+    def _pickle_df(self, pkl_data, pkl_name):
         try:
             self.logger.info(f"******** _pickle_df start ********")
 
-            self.logger.debug(f"pkl_data: {pkl_data}")
+            if pkl_data:
+                self.logger.debug(f"pkl_data: {pkl_data}")
 
-            self.logger.debug(f"output_path: {output_path}")
+                # pickleデータ読み込んでDataFrameにする
+                pkl_to_df = pd.read_pickle(f'installer/result_output/pickles/{pkl_name}.pkl')
+
+                self.logger.debug(f"pkl_to_df: \n{pkl_to_df.head()}")
+
+                self.logger.info(f"******** _pickle_df end ********")
+
+                return pkl_to_df
+
+            else:
+                raise ValueError('pkl_data が None ')
 
 
-
-
-            self.logger.info(f"******** _pickle_df start ********")
+        except ValueError as ve:
+            self.logger.error(f"pkl_data None {ve}")
+            raise
 
         except Exception as e:
-            self.logger.error(f"pickleデータを変換中にエラーが発生{e}")
+            self.logger.error(f"_pickle_df pickleデータを変換中にエラーが発生{e}")
             raise
 
 

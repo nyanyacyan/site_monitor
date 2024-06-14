@@ -103,13 +103,10 @@ class Flow:
         #todo 過去のバイナリデータを読み込む
         # バイナリデータを読み込むクラスを作成
         # バイナリデータをdfにして比較できるようにする
-        before_data = self.pickle._pkl_to_utf8(
-            pkl_file=f'installer/result_output/pickles/{self.account_id}.pkl',
-            field_name='_pkl_to_utf8'
+        old_df = self.pickle._pickle_df(
+            pkl_data=f'installer/result_output/pickles/{self.account_id}.pkl',
+            pkl_name=f'{self.account_id}'
         )
-
-        before_df = pd.DataFrame(before_data)
-        self.logger.debug(f"before_df:\n{before_df.head(3)}")
 
 
         #todo 比較して「過去のデータにない商品」を真偽値で示す
