@@ -186,7 +186,7 @@ class DFCreate:
 # ----------------------------------------------------------------------------------
 # pickleデータへの変換
 
-    def _to_pkl(self, new_data, fullpath, field_name):
+    def _to_pkl(self, new_data, fullpath, field_name='_to_pkl'):
         try:
             with open(f'{fullpath}.pkl', 'wb') as f:
                 binary_data = pickle.dump(new_data, f)
