@@ -153,18 +153,22 @@ class DFCreate:
 
 # ----------------------------------------------------------------------------------
 # pickleデータを通常のデータへ変換
-#TODO: resultがNoneかどうかをチェックする
 
     def _pkl_to_utf8(self, pkl_file, field_name):
         try:
-            with open(pkl_file, 'rb') as f:
-                binary_data = f.read()
+            if pkl_file:
+                with open(pkl_file, 'rb') as f:
+                    binary_data = f.read()
 
-                text_data = binary_data.decode('utf-8')
+                    text_data = binary_data.decode('utf-8')
 
-                self.logger.debug(f"{field_name} text_data: {text_data}")
+                    self.logger.debug(f"{field_name} text_data: {text_data}")
 
-                return text_data
+                    return text_data
+
+            else:
+                self.logger.warning(f"pickle が存在しない: {pkl_file}")
+                raise FileNotFoundError(f"{field_name} {pkl_file}が見つまりません{e}")
 
         except FileNotFoundError as e:
             self.logger.error(f"{field_name} {pkl_file}が見つまりません{e}")

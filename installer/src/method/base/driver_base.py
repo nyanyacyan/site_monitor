@@ -20,10 +20,9 @@ from selenium.common.exceptions import (ElementNotInteractableException,
 
 # 自作モジュール
 from .utils import Logger
-from installer.src.method.base.errorNotify import ErrorDiscord
 
 
-# ----------------------------------------------------------------------------------
+###############################################################
 
 
 class Base:
@@ -36,11 +35,11 @@ class Base:
         self.discord_url = discord_url
         self.logger = self.setup_logger(debug_mode=debug_mode)
 
-        # 自作モジュールインスタンス化
-        self.error_discord = ErrorDiscord(discord_url=self.discord_url)
 
 
+###############################################################
 # ----------------------------------------------------------------------------------
+
 # 要素を探して入力
 
     def input_write(self, xpath, input_value, field_name):
@@ -157,6 +156,19 @@ class Base:
                 str(e)
             )
 
+###############################################################
+
+
+class Wait:
+    def __init__(self, chrome, debug_mode=False):
+        # logger
+        self.setup_logger = Logger(__name__, debug_mode=debug_mode)
+        self.logger = self.setup_logger.setup_logger()
+
+        self.chrome = chrome
+
+
+###############################################################
 # ----------------------------------------------------------------------------------
 # ページがちゃんと表示されるまで待機
 
@@ -207,3 +219,13 @@ class Base:
 
 
 # ----------------------------------------------------------------------------------
+# データのリストを取得
+
+    def _get_element(self):
+        try:
+            self.logger.info(f"******** google_map_api_request start ********")
+
+            self.logger.info(f"******** google_map_api_request end ********")
+
+        except Exception as e:
+            self.logger.error(f" google_map_api_request 処理中にエラーが発生: {e}")

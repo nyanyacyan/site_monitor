@@ -391,7 +391,7 @@ class Operation:
 
 # ----------------------------------------------------------------------------------
 # A=whirl, B=3D, C=PUZZLE
-#! ここがおかしい　コンプリート状態が出てないのに先に処理をしている 
+#! ここがおかしいコンプリート状態が出てないのに先に処理をしている 
     def _judgement_process(self, A_element_name, A_by, A_xpath, A_process, B_element_name, B_by, B_xpath, B_process, C_element_name, C_by, C_xpath, C_process, D_element_name, D_process, field_name):
 
         self.logger.info(f"*********** _judgement_process 処理 開始 ***********")

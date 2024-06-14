@@ -29,13 +29,13 @@ class StartSpreadsheetRead(SpreadsheetRead):
 
 # スプシからブランド名を読み込む
     def _sort_brand_name(self):
-        column_name = 'ブランド名'
+        column_name = 'brand_name'
         return super()._sort_column_name(column_name)
 
 
 # スプシからサイトURLを読み込む
     def _sort_site_url(self):
-        column_name = 'サイトURL'
+        column_name = 'url'
         return super()._sort_column_name(column_name)
 
 

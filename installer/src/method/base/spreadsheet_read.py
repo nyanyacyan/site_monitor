@@ -48,7 +48,7 @@ class SpreadsheetRead:
         df = pd.read_csv(data_io, on_bad_lines='skip')
 
         # Indexを「account_id」にしたデータフレームを返してる
-        return df.set_index('アカウントNo.')
+        return df.set_index('ID')
 
 
 # ----------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ class SpreadsheetRead:
 # ブランド名 抽出
 
     def get_brand_name(self):
-        get_brand_name = self._sort_column_name('ブランド名')
+        get_brand_name = self._sort_column_name('brand_name')
         self.logger.debug(f"get_brand_name: {get_brand_name}")
 
         return get_brand_name
@@ -123,7 +123,7 @@ class SpreadsheetRead:
 # URL 抽出
 
     def get_url(self):
-        get_url = self._sort_column_name('サイトURL')
+        get_url = self._sort_column_name('url')
         self.logger.debug(f"get_url: {get_url}")
 
         return get_url

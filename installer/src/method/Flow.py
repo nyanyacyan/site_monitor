@@ -6,13 +6,19 @@
 
 #* 流れ  【非同期処理して並列処理】検索ワードを含んだURLにて検索→サイトを開く→解析→ブランド名、商品名、価格のリスト作成→バイナリデータへ保存→保存されてるバイナリデータ（保存した過去データ）を復元→現在のデータと突き合わせる→今までと違うものをリスト化→通知する
 # ----------------------------------------------------------------------------------
-import os, time
 
+
+import os, time
+import pandas as pd
+from datetime import datetime
 
 # 自作モジュール
 from .base.chrome import ChromeManager
 from .gss_login import StartSpreadsheetRead, OverAutoLogin, Drop
 from .base.utils import Logger
+from .base.driver_get_element import GetElement
+
+
 # ----------------------------------------------------------------------------------
 ###############################################################
 
@@ -35,6 +41,9 @@ class Flow:
         self.start_spreadsheet = StartSpreadsheetRead(sheet_url=sheet_url, account_id=account_id)
         self.auto_login = OverAutoLogin(chrome=self.chrome, debug_mode=debug_mode)
         self.drop_down = Drop(chrome=self.chrome, debug_mode=debug_mode)
+        self.get_element = GetElement(chrome=self.chrome, debug_mode=debug_mode)
+
+        self.current_date = datetime.now().strftime('%m-%d %H:%M')
 
 
 
@@ -54,18 +63,6 @@ class Flow:
 # 商品状態
 # DataFrameにして比較できるようにする
 
-#todo 過去のバイナリデータを読み込む
-# バイナリデータを読み込むクラスを作成
-# バイナリデータをdfにして比較できるようにする
-
-#todo 比較して「過去のデータにない商品」を真偽値で示す
-# 真偽値にてFalseだった場合には処理を終了
-
-#todo 比較して「過去のデータにない商品」をピックアップする
-
-#todo 最新のデータをバイナリデータで保存
-
-#todo 新着商品がある場合に通知
 
 
     def single_process(self, field_name='monitor_flow'):
@@ -81,13 +78,44 @@ class Flow:
         self.logger.info(f"brand_name: {brand_name}, url: {url}")
         self.auto_login.open_site(url=url)
 
-#todo 商品のリスト読み込む
-# ブランド名（各メソッドに埋め込めるようにする）
-# ジャンル
-# 商品状態
-# DataFrameにして比較できるようにする
+
+        # 商品のリスト読み込む
+        dict_data =self.get_element.elements_to_dict(
+            items_xpath="//div[@id='searchResultListWrapper']//li[@class='js-favorite itemCard']",
+            data_xpaths={
+                'goodsid':  {'method': 'attribute', 'detail_xpath': 'goodsid'},
+                'brand': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_brand']"},
+                'name': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_name']"},
+                'status': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_status']"},
+                'price': {'method': 'text', 'detail_xpath': ".//p[contains (@class, 'itemCard_price')]"}
+            },
+        )
+        time.sleep(2)
+
+        # DataFrameにして比較できるようにする
+        df = pd.DataFrame(dict_data)
+        self.logger.info(f"df: \n{df.head(5)}")
+
+        df.to_csv(f'installer/result_output/{self.account_id}_{self.current_date}.csv')
 
 
+
+        #todo 過去のバイナリデータを読み込む
+        # バイナリデータを読み込むクラスを作成
+        # バイナリデータをdfにして比較できるようにする
+
+
+
+
+
+        #todo 比較して「過去のデータにない商品」を真偽値で示す
+        # 真偽値にてFalseだった場合には処理を終了
+
+        #todo 比較して「過去のデータにない商品」をピックアップする
+
+        #todo 最新のデータをバイナリデータで保存
+
+        #todo 新着商品がある場合に通知
 
         self.logger.debug(f"***** {field_name}  {self.account_id} 終了*****")
 

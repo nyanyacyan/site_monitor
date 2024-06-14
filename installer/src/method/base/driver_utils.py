@@ -26,9 +26,8 @@ from .utils import Logger
 # self.driver_wait = Wait(chrome=chrome, debug_mode=debug_mode)
 
 class Wait:
-    def __init__(self, chrome, discord_url, debug_mode=False):
+    def __init__(self, chrome, debug_mode=False):
         self.chrome = chrome
-        self.discord_url = discord_url
         self.logger = self.setup_logger(debug_mode=debug_mode)
 
         # self.error_discord = ErrorDiscord(chrome=self.chrome, discord_url=discord_url)
