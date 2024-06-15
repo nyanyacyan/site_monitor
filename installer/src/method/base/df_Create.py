@@ -1256,7 +1256,7 @@ class DFCreate:
 # ----------------------------------------------------------------------------------
 # 返ってくる値によって実行処理を変更する
 
-    def is_result_branch(self, diff_row_df, notify_func, save_func):
+    def is_result_branch(self, diff_row_df, notify_func, save_func, key_df, save_pickle_path):
         try:
             self.logger.info(f"********** result_process start **********")
 
@@ -1264,10 +1264,10 @@ class DFCreate:
                 self.logger.debug(f"diff_row_df:\n{diff_row_df.head(3)}")
                 notify_func(diff_row_df)
                 time.sleep(2)
-                save_func()
+                save_func(key_df, save_pickle_path)
 
             else:
-                save_func()
+                save_func(key_df, save_pickle_path)
 
             self.logger.info(f"********** result_process end **********")
 

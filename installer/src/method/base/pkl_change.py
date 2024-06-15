@@ -87,25 +87,23 @@ class PickleControl:
 # ----------------------------------------------------------------------------------
 # pickleデータからDataFrameに変換
 
-    def _pickle_df(self, pkl_data, pkl_name):
+    def _pickle_df(self, pkl_name):
         try:
             self.logger.info(f"******** _pickle_df start ********")
 
-            if pkl_data:
-                self.logger.debug(f"pkl_data: {pkl_data}")
+            # pickleデータ読み込んでDataFrameにする
+            pkl_to_df = pd.read_pickle(f'installer/result_output/pickles/{pkl_name}.pkl')
 
-                # pickleデータ読み込んでDataFrameにする
-                pkl_to_df = pd.read_pickle(f'installer/result_output/pickles/{pkl_name}.pkl')
+            self.logger.debug(f"pkl_to_df: \n{pkl_to_df.head()}")
 
-                self.logger.debug(f"pkl_to_df: \n{pkl_to_df.head()}")
+            self.logger.info(f"******** _pickle_df end ********")
 
-                self.logger.info(f"******** _pickle_df end ********")
+            return pkl_to_df
 
-                return pkl_to_df
 
-            else:
-                raise ValueError('pkl_data が None ')
-
+        except FileNotFoundError as fe:
+            self.logger.error(f"{pkl_name}.pkl が見つかりません {fe}")
+            raise
 
         except ValueError as ve:
             self.logger.error(f"pkl_data None {ve}")
@@ -117,5 +115,35 @@ class PickleControl:
 
 
 # ----------------------------------------------------------------------------------
+# DataFrameからpickleデータへ変換
+
+    def df_pickle(self, df, save_pickle_path):
+        try:
+            self.logger.info(f"******** df_pickle start ********")
+
+            self.logger.debug(f"df:\n{df.head(3)}")
+            self.logger.debug(f"save_pickle_path:{save_pickle_path}")
+
+            if not df.empty:
+                df.to_pickle(save_pickle_path)
+
+            else:
+                raise ValueError('pkl_data is None ')
+
+
+            self.logger.info(f"******** df_pickle end ********")
+
+
+        except ValueError as ve:
+            self.logger.error(f"pkl_data None {ve}")
+            raise
+
+        except Exception as e:
+            self.logger.error(f"df_pickle pickleデータを変換中にエラーが発生{e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------
+
 # **********************************************************************************
 

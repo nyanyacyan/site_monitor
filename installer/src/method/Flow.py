@@ -1,11 +1,12 @@
 # coding: utf-8
 #! ここにChromeを展開する
 #! なるべくここでは引数を渡さない
-# ----------------------------------------------------------------------------------
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
 # 2023/4/17 更新
 
 #* 流れ  【非同期処理して並列処理】検索ワードを含んだURLにて検索→サイトを開く→解析→ブランド名、商品名、価格のリスト作成→バイナリデータへ保存→保存されてるバイナリデータ（保存した過去データ）を復元→現在のデータと突き合わせる→今までと違うものをリスト化→通知する
-# ----------------------------------------------------------------------------------
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 
 import os, time
@@ -18,11 +19,11 @@ from .gss_login import StartSpreadsheetRead, OverAutoLogin, Drop
 from .base.utils import Logger
 from .base.driver_get_element import GetElement
 from .base.pkl import PickleControl
+from diff_df_processing import DiffDfProcess
 
 
-# ----------------------------------------------------------------------------------
-###############################################################
-
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# **********************************************************************************
 # 一連の流れ
 
 class Flow:
@@ -43,8 +44,8 @@ class Flow:
         self.auto_login = OverAutoLogin(chrome=self.chrome, debug_mode=debug_mode)
         self.drop_down = Drop(chrome=self.chrome, debug_mode=debug_mode)
         self.get_element = GetElement(chrome=self.chrome, debug_mode=debug_mode)
-        self.pickle = PickleControl(chrome=self.chrome, debug_mode=debug_mode)
-        self.df_create = 
+        self.pkl_control = PickleControl(chrome=self.chrome, debug_mode=debug_mode)
+        self.diff_df_processing = DiffDfProcess(chrome=self.chrome, debug_mode=debug_mode)
 
         # 現時刻を掲載
         self.current_date = datetime.now().strftime('%m-%d %H:%M')
@@ -55,18 +56,6 @@ class Flow:
 
 
 # ----------------------------------------------------------------------------------
-# スプシから「ブランド名」を読み込む
-#todo サイトを開く
-# 専用のURLを使う
-# 画面領域は広く取る
-# 新着順に並び替える
-
-#todo 商品のリスト読み込む
-# ブランド名（各メソッドに埋め込めるようにする）
-# ジャンル
-# 商品状態
-# DataFrameにして比較できるようにする
-
 
 
     def single_process(self, field_name='monitor_flow'):
@@ -96,58 +85,22 @@ class Flow:
         )
         time.sleep(2)
 
-        # DataFrameにして比較できるようにする
-        current_df = pd.DataFrame(dict_data)
-        self.logger.info(f"current_df: \n{current_df.head(5)}")
-
-
-        #todo 過去のバイナリデータを読み込む
-        # バイナリデータを読み込むクラスを作成
-        # バイナリデータをdfにして比較できるようにする
-        old_df = self.pickle._pickle_df(
-            pkl_data=f'installer/result_output/pickles/{self.account_id}.pkl',
-            pkl_name=f'{self.account_id}'
+        # DataFrameとDataFrameを突合させて差分の真偽値別に処理をする
+        self.diff_df_processing.diff_df_processing(
+            data=dict_data,
+            pkl_name=f' {self.account_id} ',
+            head_num='30',
+            select_column='goodsid',
+            notify_func='',
+            save_func=self.pkl_control.df_pickle,
+            save_pickle_path=f'installer/result_output/pickles/{self.account_id}.pkl'
         )
 
 
-        #todo 比較して「過去のデータにない商品」を真偽値で示す
-        #TODO 今のDataFrameと前のDataFrameの違いを出すメソッドを作成する→どんなものが来てもできるようにする
-
-
-        #todo 比較して「過去のデータにない商品」をピックアップする
-
-
-        #TODO 真偽値にてFalseだった場合には通知する
-
-
-        #todo 最新のデータをバイナリデータで保存
-        current_df.to_pickle(f'installer/result_output/pickles/{self.account_id}.pkl')
 
 
 
-        #todo 新着商品がある場合に通知
-
-        self.logger.debug(f"***** {field_name}  {self.account_id} 終了*****")
-
-
-
-
-
-# ----------------------------------------------------------------------------------
-#todo 各メソッドをまとめる
-
-    def process(self, ):
-        self.logger.debug(f"***** Flow.process 開始 *****")
-
-        self.get_name()
-        self.get_url()
-
-
-
-        self.logger.debug(f"***** Flow.process 終了 *****")
-
-
-
+# **********************************************************************************
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # テスト実施
 

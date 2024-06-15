@@ -33,7 +33,7 @@ class DiffDfProcess:
 # ----------------------------------------------------------------------------------
 # DataFrameとDataFrameを突合させて差分の真偽値別に処理をする
 
-    def diff_df_processing(self, data, pkl_data, pkl_name, head_num, select_column, notify_func, save_func):
+    def diff_df_processing(self, data, pkl_name, head_num, select_column, notify_func, save_func, save_pickle_path):
         try:
             self.logger.info(f"********** diff_df_processing start **********")
 
@@ -44,7 +44,7 @@ class DiffDfProcess:
                 current_df = pd.DataFrame(data)
 
                 # 過去のpickleデータをDataFrameに変換
-                old_df = self.pickle_control._pickle_df(pkl_data=pkl_data, pkl_name=pkl_name)
+                old_df = self.pickle_control._pickle_df(pkl_name=pkl_name)
 
                 # old_dfがなかったらエラーを出す
                 if old_df is None or old_df.empty:
@@ -54,7 +54,7 @@ class DiffDfProcess:
                 diff_row_df = self.df_create.df_row_diff_value(current_df=current_df, old_df=old_df, head_num=head_num, select_column=select_column)
 
                 # 返ってくる値によって実行処理を変更する
-                self.df_create.is_result_branch(diff_row_df=diff_row_df, notify_func=notify_func, save_func=save_func)
+                self.df_create.is_result_branch(diff_row_df=diff_row_df, notify_func=notify_func, save_func=save_func, key_df=current_df, save_pickle_path=save_pickle_path)
 
                 self.logger.info(f"********** diff_df_processing end **********")
 
