@@ -87,10 +87,10 @@ class LineNotify:
                 files = {'imageFile': (image_file, jpeg_bin, 'image/jpeg')}
                 response = requests.post(line_end_point, headers = headers, data=data, files=files)
 
-                if response.status_code == 200:
-                    self.logger.debug("送信成功")
-                else:
-                    self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
+            if response.status_code == 200:
+                self.logger.debug("送信成功")
+            else:
+                self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
 
             self.logger.info(f"********** line_image_notify end **********")
 
@@ -201,19 +201,19 @@ class ChatworkNotify:
                 # chatworkに画像とメッセージを送る
                 response = requests.post(url, headers = headers, data=data, files=files)
 
-                if response.status_code == 200:
-                    self.logger.debug("送信成功")
-                    time.sleep(5)
+            if response.status_code == 200:
+                self.logger.debug("送信成功")
+                time.sleep(5)
 
-                    self._img_remove(img_path=img_path)
-                    self.logger.info(f"********** chatwork_image_notify end **********")
-                    return self.logger.info('送信処理に成功（画像削除完了）')
+                self._img_remove(img_path=img_path)
+                self.logger.info(f"********** chatwork_image_notify end **********")
+                return self.logger.info('送信処理に成功（画像削除完了）')
 
-                else:
-                    self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
-                    self._img_remove(img_path=img_path)
-                    self.logger.info(f"********** chatwork_image_notify end **********")
-                    return self.logger.warning('送信処理に失敗（画像削除完了）')
+            else:
+                self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
+                self._img_remove(img_path=img_path)
+                self.logger.info(f"********** chatwork_image_notify end **********")
+                return self.logger.warning('送信処理に失敗（画像削除完了）')
 
 
         except FileNotFoundError as e:
@@ -395,8 +395,8 @@ class SlackNotify:
             with open(img_path, 'rb') as jpeg_bin:
                 files = {'file': (img_path, jpeg_bin, 'image/jpeg')}
 
-            # Slackに画像とメッセージを送る
-            response = requests.post(end_point, headers = headers, data=data, files=files)
+                # Slackに画像とメッセージを送る
+                response = requests.post(end_point, headers = headers, data=data, files=files)
 
             if response.status_code == 200:
                 return self.logger.info(f"送信処理完了")
@@ -404,6 +404,101 @@ class SlackNotify:
             else:
                 return self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
 
+
+
+        except FileNotFoundError as e:
+            self.logger.error(f"指定されてるファイルが見つかりません:{e}")
+            raise
+
+        except requests.exceptions.ConnectionError as e:
+            self.logger.error(f"Connection error: {e}")
+            raise
+
+        except requests.exceptions.Timeout as e:
+            self.logger.error(f"Timeout error: {e}")
+            raise
+
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request error: {e}")
+            raise
+
+        except Exception as e:
+            self.logger.error(f"line_image_notify 処理中にエラーが発生:{e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------
+# **********************************************************************************
+# Discord通知
+
+class DiscordNotify:
+    def __init__(self, debug_mode=False):
+        # logger
+        self.setup_logger = Logger(__name__, debug_mode=debug_mode)
+        self.logger = self.setup_logger.setup_logger()
+
+
+# ----------------------------------------------------------------------------------
+# 本文のみ
+
+    def discord_notify(self, message):
+        try:
+            self.logger.info(f"********** slack_notify start **********")
+
+            self.logger.debug(f"message: {message}")
+
+            end_point = const.EndPoint.Discord.value
+
+            response = requests.post(end_point, data={"content": message})
+
+            if response.status_code == 204:
+                self.logger.info(f"********** slack_notify end **********")
+                return self.logger.info(f"送信処理完了")
+
+            else:
+                self.logger.info(f"********** slack_notify end **********")
+                return self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
+
+
+        except requests.exceptions.ConnectionError as e:
+            self.logger.error(f"Connection error: {e}")
+            raise
+
+        except requests.exceptions.Timeout as e:
+            self.logger.error(f"Timeout error: {e}")
+            raise
+
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request error: {e}")
+            raise
+
+        except Exception as e:
+            self.logger.error(f"line_image_notify 処理中にエラーが発生:{e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------
+# 本文＋画像
+
+    def discord_image_notify(self, message, img_path):
+        try:
+            self.logger.info(f"********** discord_image_notify start **********")
+
+            self.logger.debug(f"message: {message}")
+            end_point = const.EndPoint.Discord.value
+
+            with open(img_path, 'rb') as jpeg_bin:
+                files = {'file': (img_path, jpeg_bin, 'image/jpeg')}
+
+                response = requests.post(end_point, data={"content": message}, files=files)
+
+            if response.status_code == 204:
+                self.logger.info(f"********** discord_image_notify end **********")
+                return self.logger.info(f"送信処理完了")
+
+            else:
+                self.logger.info(f"********** discord_image_notify end **********")
+                return self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
 
 
         except FileNotFoundError as e:
