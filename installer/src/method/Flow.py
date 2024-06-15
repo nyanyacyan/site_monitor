@@ -18,8 +18,9 @@ from .base.chrome import ChromeManager
 from .gss_login import StartSpreadsheetRead, OverAutoLogin, Drop
 from .base.utils import Logger
 from .base.driver_get_element import GetElement
-from .base.pkl import PickleControl
+from .base.pkl_change import PickleControl
 from diff_df_processing import DiffDfProcess
+from .base.notify import LineNotify
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -46,6 +47,7 @@ class Flow:
         self.get_element = GetElement(chrome=self.chrome, debug_mode=debug_mode)
         self.pkl_control = PickleControl(chrome=self.chrome, debug_mode=debug_mode)
         self.diff_df_processing = DiffDfProcess(chrome=self.chrome, debug_mode=debug_mode)
+        self.line = LineNotify(debug_mode=debug_mode)
 
         # 現時刻を掲載
         self.current_date = datetime.now().strftime('%m-%d %H:%M')
@@ -91,7 +93,8 @@ class Flow:
             pkl_name=f' {self.account_id} ',
             head_num='30',
             select_column='goodsid',
-            notify_func='',
+            opening_message=f'{self.current_date}\n新しい商品が入荷を検知しました。\n下記の商品をご確認ください。\n',
+            notify_func=self.line.line_notify,
             save_func=self.pkl_control.df_pickle,
             save_pickle_path=f'installer/result_output/pickles/{self.account_id}.pkl'
         )

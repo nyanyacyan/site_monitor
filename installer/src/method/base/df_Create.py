@@ -1256,12 +1256,16 @@ class DFCreate:
 # ----------------------------------------------------------------------------------
 # 返ってくる値によって実行処理を変更する
 
-    def is_result_branch(self, diff_row_df, notify_func, save_func, key_df, save_pickle_path):
+    def is_result_branch(self, diff_row_df, opening_message, notify_func, save_func, key_df, save_pickle_path):
         try:
             self.logger.info(f"********** result_process start **********")
 
-            if diff_row_df:
+            if not diff_row_df.empty:
                 self.logger.debug(f"diff_row_df:\n{diff_row_df.head(3)}")
+
+                # 結果のDataFrameを通知に掲載するtextに変換
+                self._df_to_message(df=diff_row_df, opening_message=opening_message)
+
                 notify_func(diff_row_df)
                 time.sleep(2)
                 save_func(key_df, save_pickle_path)
@@ -1270,6 +1274,36 @@ class DFCreate:
                 save_func(key_df, save_pickle_path)
 
             self.logger.info(f"********** result_process end **********")
+
+
+        except Exception as e:
+                self.logger.error(f"result_process  処理中にエラーが発生: {e}")
+                raise
+
+
+# ----------------------------------------------------------------------------------
+# 結果のDataFrameを通知に掲載するtextに変換
+
+    def _df_to_message(self, df, opening_message):
+        try:
+            self.logger.info(f"********** result_process start **********")
+
+            if opening_message:
+                df_text = df.to_string()
+
+                self.logger.debug(f"df_text: {df_text}")
+
+                df_message = f"{opening_message}\n\n{df_text}"
+
+                self.logger.debug(f"df_message: {df_message}")
+
+                self.logger.info(f"********** result_process end **********")
+
+                return df_message
+
+            else:
+                self.logger.warning(f"付け加えるメッセージがありません")
+                return df_text
 
 
         except Exception as e:

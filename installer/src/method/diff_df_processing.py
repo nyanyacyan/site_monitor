@@ -33,7 +33,7 @@ class DiffDfProcess:
 # ----------------------------------------------------------------------------------
 # DataFrameとDataFrameを突合させて差分の真偽値別に処理をする
 
-    def diff_df_processing(self, data, pkl_name, head_num, select_column, notify_func, save_func, save_pickle_path):
+    def diff_df_processing(self, data, pkl_name, head_num, select_column, opening_message, notify_func, save_func, save_pickle_path):
         try:
             self.logger.info(f"********** diff_df_processing start **********")
 
@@ -54,7 +54,7 @@ class DiffDfProcess:
                 diff_row_df = self.df_create.df_row_diff_value(current_df=current_df, old_df=old_df, head_num=head_num, select_column=select_column)
 
                 # 返ってくる値によって実行処理を変更する
-                self.df_create.is_result_branch(diff_row_df=diff_row_df, notify_func=notify_func, save_func=save_func, key_df=current_df, save_pickle_path=save_pickle_path)
+                self.df_create.is_result_branch(diff_row_df=diff_row_df, opening_message=opening_message, notify_func=notify_func, save_func=save_func, key_df=current_df, save_pickle_path=save_pickle_path)
 
                 self.logger.info(f"********** diff_df_processing end **********")
 
