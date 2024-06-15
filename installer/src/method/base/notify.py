@@ -317,3 +317,115 @@ class ChatworkNotify:
 
 # ----------------------------------------------------------------------------------
 # **********************************************************************************
+# Slack通知
+
+class SlackNotify:
+    def __init__(self, debug_mode=False):
+        # logger
+        self.setup_logger = Logger(__name__, debug_mode=debug_mode)
+        self.logger = self.setup_logger.setup_logger()
+
+        # token
+        # 通知するチャンネルから権限を選択=> アプリインストールしてトークン作成=> .envに貼り付ける
+        # slackの場合、メッセージ+画像はNG。画像+コメントになる
+        self.slack_notify_token = os.getenv('SLACK_NOTIFY_TOKEN')
+        self.slack_channel = os.getenv('SLACK_CHANNEL')
+
+
+# ----------------------------------------------------------------------------------
+# 本文のみ
+
+    def slack_notify(self, message):
+        try:
+            self.logger.info(f"********** slack_notify start **********")
+
+            self.logger.debug(f"message: {message}")
+
+            end_point = const.EndPoint.Slack.value
+
+            headers = {'Authorization': f'Bearer {self.slack_notify_token}'}
+            data = {
+                'channel': {self.slack_channel},
+                'text': {message}
+            }
+
+            response = requests.post(end_point, headers = headers, data=data)
+
+            if response.status_code == 200:
+                self.logger.info(f"********** slack_notify end **********")
+                return self.logger.info(f"送信処理完了")
+
+            else:
+                self.logger.info(f"********** slack_notify end **********")
+                return self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
+
+
+        except requests.exceptions.ConnectionError as e:
+            self.logger.error(f"Connection error: {e}")
+            raise
+
+        except requests.exceptions.Timeout as e:
+            self.logger.error(f"Timeout error: {e}")
+            raise
+
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request error: {e}")
+            raise
+
+        except Exception as e:
+            self.logger.error(f"line_image_notify 処理中にエラーが発生:{e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------
+# 本文＋画像
+
+    def slack_image_notify(self, message, img_path):
+        try:
+            end_point = const.EndPoint.Slack.value
+
+            headers = {'Authorization': f'Bearer {self.slack_notify_token}'}
+            data = {
+                'channels': self.slack_channel,
+                'initial_comment': message,
+                'filename': os.path.basename(img_path)
+            }
+
+            # 画像ファイルを指定する（png or jpeg）
+            with open(img_path, 'rb') as jpeg_bin:
+                files = {'file': (img_path, jpeg_bin, 'image/jpeg')}
+
+            # Slackに画像とメッセージを送る
+            response = requests.post(end_point, headers = headers, data=data, files=files)
+
+            if response.status_code == 200:
+                return self.logger.info(f"送信処理完了")
+
+            else:
+                return self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
+
+
+
+        except FileNotFoundError as e:
+            self.logger.error(f"指定されてるファイルが見つかりません:{e}")
+            raise
+
+        except requests.exceptions.ConnectionError as e:
+            self.logger.error(f"Connection error: {e}")
+            raise
+
+        except requests.exceptions.Timeout as e:
+            self.logger.error(f"Timeout error: {e}")
+            raise
+
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request error: {e}")
+            raise
+
+        except Exception as e:
+            self.logger.error(f"line_image_notify 処理中にエラーが発生:{e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------
+# **********************************************************************************

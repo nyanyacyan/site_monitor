@@ -57,11 +57,6 @@ class SlackNotify:
 
 
     def slack_image_notify(self, notification_message):
-        """
-        "Slack Notify"から 画像 + コメント 通知する
-        """
-
-
         slack_files_upload_api = 'https://slack.com/api/files.upload'
         headers = {'Authorization': f'Bearer {self.slack_notify_token}'}
         data = {
@@ -75,7 +70,7 @@ class SlackNotify:
             image_file = 'login_after_take.jpeg'
             with open(image_file, 'rb') as jpeg_bin:
                 files = {'file': (image_file, jpeg_bin, 'image/jpeg')}
-                
+
                 # Slackに画像とメッセージを送る
                 response = requests.post(slack_files_upload_api, headers = headers, data=data, files=files)
 
