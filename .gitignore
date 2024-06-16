@@ -29,8 +29,6 @@ whisper_write_file.txt
 
 venv_shopers_scraping/
 
-# テストファイルを無視する。
-*test*
 
 #  Excelデータ
 *.xlsx
@@ -71,9 +69,6 @@ DebugScreenshot/
 # pycache
 __pycache__/
 *.pyc
-
-データファイル
-const.py
 
 bin/
 
