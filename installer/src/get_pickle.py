@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------------
 import asyncio
 from const import SiteUrl, AccountId
-from method.AsyncProcess import AsyncProcess
+from method.AsyncProcess import AsyncGetPickle
 
 
 
@@ -25,7 +25,7 @@ class Main:
          AccountId.account_id_e.value
       ]
 
-      async_process = AsyncProcess(account_ids=account_ids)
+      async_process = AsyncGetPickle(account_ids=account_ids)
 
       await async_process.flow_task_process()
 

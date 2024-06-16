@@ -1220,10 +1220,10 @@ class DFCreate:
 # ----------------------------------------------------------------------------------
 # ２つのDataFrameの行単位での差分を出す
 
-    def df_row_diff_value(self, current_df, old_df, head_num, select_column):
+    def df_row_diff_value(self, current_df, old_df, head_num, select_column, account_id):
         try:
             self.logger.info(f"********** df_row_diff_value start **********")
-            
+
             self.logger.debug(type(head_num))
 
             # DataFrameの比較する対象範囲を決める
@@ -1239,14 +1239,14 @@ class DFCreate:
             # もしDataFrameにデータがあった場合に
             if not diff_row_df.empty:
                 self.logger.debug(f"diff_row_data:\n{diff_row_df.head(3)}")
-                self.logger.info(f"********** df_row_diff_value end **********")
+                self.logger.info(f"********** {account_id} df_row_diff_value end **********")
 
                 return diff_row_df
 
             # 新しいデータなし
             else:
-                self.logger.info('新しいデータ、なし')
-                self.logger.info(f"********** df_row_diff_value end **********")
+                self.logger.warning(f'{account_id} 新しいデータ、なし')
+                self.logger.info(f"********** {account_id} df_row_diff_value end **********")
 
                 return None
 

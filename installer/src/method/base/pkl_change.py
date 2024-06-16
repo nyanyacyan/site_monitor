@@ -4,6 +4,8 @@
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
+
+import os
 import pickle
 import pandas as pd
 
@@ -87,16 +89,23 @@ class PickleControl:
 # ----------------------------------------------------------------------------------
 # pickleデータからDataFrameに変換
 
-    def _pickle_df(self, pkl_name):
+    def _pickle_df(self, pkl_name, pkl_path):
         try:
             self.logger.info(f"******** _pickle_df start ********")
 
+            self.logger.debug(f"pkl_name: {pkl_name}")
+            self.logger.debug(f"pkl_path: {pkl_path}")
+
+            # 前後についてしまってる余計な空白を除去
             pkl_file_name = pkl_name.strip()
 
-            # pickleデータ読み込んでDataFrameにする
-            pkl_to_df = pd.read_pickle(f'installer/result_output/pickles/{pkl_file_name}.pkl')
+            pkl_full_path = os.path.join(pkl_path, f'{pkl_file_name}.pkl')
 
-            self.logger.debug(f"pkl_to_df: \n{pkl_to_df.head()}")
+            if os.path.exists(pkl_full_path):
+                # pickleデータ読み込んでDataFrameにする
+                pkl_to_df = pd.read_pickle(pkl_full_path)
+                self.logger.debug(f"pkl_to_df: \n{pkl_to_df.head()}")
+
 
             self.logger.info(f"******** _pickle_df end ********")
 

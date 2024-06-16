@@ -32,7 +32,7 @@ from .base.notify import LineNotify
 
 class Flow:
     def __init__(self, account_id, debug_mode=False):
-        self.sheet_url = SiteUrl.value
+        self.sheet_url = SiteUrl.sheet.value
         self.account_id = account_id
 
         # logger
@@ -58,8 +58,6 @@ class Flow:
 
 
 ###############################################################
-
-
 # ----------------------------------------------------------------------------------
 
 
@@ -96,12 +94,14 @@ class Flow:
         self.diff_df_processing.diff_df_processing(
             data=dict_data,
             pkl_name=f' {self.account_id} ',
+            pkl_path='installer/result_output/pickles/',
             head_num=30,
             select_column='goodsid',
             opening_message=f'{self.current_date}\n新しい商品が入荷を検知しました。\n下記の商品をご確認ください。\n',
             notify_func=self.line.line_notify,
             save_func=self.pkl_control.df_pickle,
-            save_pickle_path=f'installer/result_output/pickles/{self.account_id}.pkl'
+            save_pickle_path=f'installer/result_output/pickles/{self.account_id}.pkl',
+            account_id=self.account_id
         )
 
         self.logger.debug(f"*****{self.account_id} process end*****")
@@ -123,6 +123,59 @@ class Flow:
 # ----------------------------------------------------------------------------------
 # **********************************************************************************
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# テスト実施
 
 
+    def get_pickle_data(self):
+        self.logger.debug(f"*****{self.account_id} get_pickle_data start*****")
+
+        self.logger.info(f"self.sheet_url: {self.sheet_url}")
+        self.logger.info(f"self.account_id: {self.account_id}")
+
+        # 指定のスプシから情報を取得
+        brand_name = self.start_spreadsheet.get_brand_name()
+        url = self.start_spreadsheet.get_url()
+
+        self.logger.info(f"brand_name: {brand_name}, url: {url}")
+
+        # 指定のurlにアクセス
+        self.auto_login.open_site(url=url)
+
+
+        # 商品のリスト読み込む
+        dict_data =self.get_element.elements_to_dict(
+            items_xpath="//div[@id='searchResultListWrapper']//li[@class='js-favorite itemCard']",
+            data_xpaths={
+                'goodsid':  {'method': 'attribute', 'detail_xpath': 'goodsid'},
+                'brand': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_brand']"},
+                'name': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_name']"},
+                'status': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_status']"},
+                'price': {'method': 'text', 'detail_xpath': ".//p[contains (@class, 'itemCard_price')]"}
+            },
+        )
+        time.sleep(2)
+
+        first_df = pd.DataFrame(dict_data)
+
+        self.pkl_control.df_pickle(
+            df=first_df,
+            save_pickle_path=f'installer/result_output/pickles/{self.account_id}.pkl'
+        )
+
+        self.logger.debug(f"*****{self.account_id} get_pickle_data end*****")
+
+        self.logger.info(f"{self.account_id}の最初に作成するpickleデータを作成完了")
+
+
+# ----------------------------------------------------------------------------------
+# 非同期処理に変換
+
+    async def get_pickle_data_async(self):
+        # 現在、行ってるイベントループを取得
+        loop = asyncio.get_running_loop()
+
+        # ブロッキング、実行タイミング、並列処理などを適切に行えるように「functools」にてワンクッション置いて実行
+        await loop.run_in_executor(None, functools.partial(self.get_pickle_data))
+
+
+# ----------------------------------------------------------------------------------
+# **********************************************************************************
