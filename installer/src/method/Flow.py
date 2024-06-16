@@ -19,7 +19,7 @@ from .gss_login import StartSpreadsheetRead, OverAutoLogin, Drop
 from .base.utils import Logger
 from .base.driver_get_element import GetElement
 from .base.pkl_change import PickleControl
-from diff_df_processing import DiffDfProcess
+from .diff_df_processing import DiffDfProcess
 from .base.notify import LineNotify
 
 

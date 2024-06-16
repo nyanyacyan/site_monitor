@@ -36,7 +36,7 @@ class DFCreate:
 
 
         self.none_checker = NoneChecker(debug_mode=debug_mode)
-        self.spread_input = SpreadsheetWrite(chrome=self.chrome, credentials_json_file=const.spread_json, spread_id=const.spread_id, debug_mode=False)
+        # self.spread_input = SpreadsheetWrite(chrome=self.chrome, credentials_json_file=const.spread_json, spread_id=const.spread_id, debug_mode=False)
 
 
 

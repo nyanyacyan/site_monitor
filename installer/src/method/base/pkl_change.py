@@ -91,8 +91,10 @@ class PickleControl:
         try:
             self.logger.info(f"******** _pickle_df start ********")
 
+            pkl_file_name = pkl_name.strip()
+
             # pickleデータ読み込んでDataFrameにする
-            pkl_to_df = pd.read_pickle(f'installer/result_output/pickles/{pkl_name}.pkl')
+            pkl_to_df = pd.read_pickle(f'installer/result_output/pickles/{pkl_file_name}.pkl')
 
             self.logger.debug(f"pkl_to_df: \n{pkl_to_df.head()}")
 
