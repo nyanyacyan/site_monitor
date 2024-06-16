@@ -9,6 +9,10 @@ from enum import Enum
 
 class AccountId(Enum):
     account_id_a = "BRAND_A"
+    account_id_b = "BRAND_B"
+    account_id_c = "BRAND_C"
+    account_id_d = "BRAND_D"
+    account_id_e = "BRAND_E"
 
 
 

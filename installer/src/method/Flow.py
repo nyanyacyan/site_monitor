@@ -10,8 +10,11 @@
 
 
 import os, time
+import asyncio
+import functools
 import pandas as pd
 from datetime import datetime
+from const import SiteUrl
 
 # 自作モジュール
 from .base.chrome import ChromeManager
@@ -28,8 +31,8 @@ from .base.notify import LineNotify
 # 一連の流れ
 
 class Flow:
-    def __init__(self, sheet_url, account_id, debug_mode=False):
-        self.sheet_url = sheet_url
+    def __init__(self, account_id, debug_mode=False):
+        self.sheet_url = SiteUrl.value
         self.account_id = account_id
 
         # logger
@@ -41,7 +44,7 @@ class Flow:
         self.chrome = chrome_instance.setup_chrome()
 
         # インスタンス
-        self.start_spreadsheet = StartSpreadsheetRead(sheet_url=sheet_url, account_id=account_id)
+        self.start_spreadsheet = StartSpreadsheetRead(sheet_url=self.sheet_url, account_id=account_id)
         self.auto_login = OverAutoLogin(chrome=self.chrome, debug_mode=debug_mode)
         self.drop_down = Drop(chrome=self.chrome, debug_mode=debug_mode)
         self.get_element = GetElement(chrome=self.chrome, debug_mode=debug_mode)
@@ -60,8 +63,8 @@ class Flow:
 # ----------------------------------------------------------------------------------
 
 
-    def single_process(self, field_name='monitor_flow'):
-        self.logger.debug(f"***** {field_name} {self.account_id} 開始*****")
+    def single_process(self):
+        self.logger.debug(f"*****{self.account_id} process start*****")
 
         self.logger.info(f"self.sheet_url: {self.sheet_url}")
         self.logger.info(f"self.account_id: {self.account_id}")
@@ -101,10 +104,23 @@ class Flow:
             save_pickle_path=f'installer/result_output/pickles/{self.account_id}.pkl'
         )
 
+        self.logger.debug(f"*****{self.account_id} process end*****")
+
+        self.logger.warning(f"{self.account_id} 処理、完了しました。")
 
 
+# ----------------------------------------------------------------------------------
+# 非同期処理に変換
+
+    async def single_process_async(self):
+        # 現在、行ってるイベントループを取得
+        loop = asyncio.get_running_loop()
+
+        # ブロッキング、実行タイミング、並列処理などを適切に行えるように「functools」にてワンクッション置いて実行
+        await loop.run_in_executor(None, functools.partial(self.single_process))
 
 
+# ----------------------------------------------------------------------------------
 # **********************************************************************************
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # テスト実施
