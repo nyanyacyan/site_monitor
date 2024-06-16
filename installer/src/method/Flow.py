@@ -91,7 +91,7 @@ class Flow:
         self.diff_df_processing.diff_df_processing(
             data=dict_data,
             pkl_name=f' {self.account_id} ',
-            head_num='30',
+            head_num=30,
             select_column='goodsid',
             opening_message=f'{self.current_date}\n新しい商品が入荷を検知しました。\n下記の商品をご確認ください。\n',
             notify_func=self.line.line_notify,

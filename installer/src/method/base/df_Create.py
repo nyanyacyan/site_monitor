@@ -1223,6 +1223,8 @@ class DFCreate:
     def df_row_diff_value(self, current_df, old_df, head_num, select_column):
         try:
             self.logger.info(f"********** df_row_diff_value start **********")
+            
+            self.logger.debug(type(head_num))
 
             # DataFrameの比較する対象範囲を決める
             extract_current_df = current_df.head(head_num)
@@ -1260,7 +1262,7 @@ class DFCreate:
         try:
             self.logger.info(f"********** result_process start **********")
 
-            if not diff_row_df.empty:
+            if diff_row_df is not None and not diff_row_df.empty:
                 self.logger.debug(f"diff_row_df:\n{diff_row_df.head(3)}")
 
                 # 結果のDataFrameを通知に掲載するtextに変換
