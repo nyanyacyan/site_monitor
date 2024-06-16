@@ -63,14 +63,16 @@ class Flow:
     def single_process(self, field_name='monitor_flow'):
         self.logger.debug(f"***** {field_name} {self.account_id} 開始*****")
 
-#TODO ここからの流れをgss_loginにて定義してリトライができるようにする
         self.logger.info(f"self.sheet_url: {self.sheet_url}")
         self.logger.info(f"self.account_id: {self.account_id}")
 
+        # 指定のスプシから情報を取得
         brand_name = self.start_spreadsheet.get_brand_name()
         url = self.start_spreadsheet.get_url()
 
         self.logger.info(f"brand_name: {brand_name}, url: {url}")
+
+        # 指定のurlにアクセス
         self.auto_login.open_site(url=url)
 
 
