@@ -5,17 +5,11 @@
 
 
 # ----------------------------------------------------------------------------------
-import os
-import time
 
 # 自作モジュール
-from .base.spreadsheet_read import SpreadsheetRead
-from .base.driverLogin import AutoLogin
-from .base.driver_control import Operation
 from .base.df_Create import DFCreate
 from .base.utils import Logger
 
-from dotenv import load_dotenv
 
 ####################################################################################
 ####################################################################################

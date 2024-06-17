@@ -6,9 +6,7 @@
 import os
 import glob
 import time
-import pickle
 import zipfile
-import const
 import pandas as pd
 from pathlib import Path
 import shutil
@@ -19,7 +17,6 @@ from selenium.common.exceptions import (NoSuchElementException)
 # 自作モジュール
 # import const
 from .utils import Logger, NoneChecker
-from .spreadsheet_write import SpreadsheetWrite
 
 
 # ----------------------------------------------------------------------------------

@@ -9,7 +9,7 @@ import time
 import asyncio
 from const import AccountId
 
-from .method.base.utils import Logger
+from method.base.utils import Logger
 from method.AsyncProcess import AsyncProcess
 
 
