@@ -16,14 +16,15 @@ from method.AsyncProcess import AsyncProcess
 
 # ------------------------------------------------------------------------------
 
+
 class Main:
-    def __init__(self, debug_mode=False) -> None:
-        # logger
-        self.setup_logger = Logger(__name__, debug_mode=debug_mode)
-        self.logger = self.setup_logger.setup_logger()
+   def __init__(self, debug_mode=False) -> None:
+      # logger
+      self.setup_logger = Logger(__name__, debug_mode=debug_mode)
+      self.logger = self.setup_logger.setup_logger()
 
 
-    async def main(self):
+   async def main(self):
       start_time = time.time()
 
       account_ids = [
@@ -50,5 +51,5 @@ class Main:
 
 
 if __name__ == '__main__':
-    main_process = Main()
-    asyncio.run(main_process.main())
+   main_process = Main()
+   asyncio.run(main_process.main())

@@ -43,7 +43,7 @@ class ChromeManager:
             chrome_options.add_argument("--window-size=1440,900")  # ウィンドウサイズの指定
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_extension(self._get_full_path('uBlock-Origin.crx'))  # iframe対策の広告ブロッカー
+            # chrome_options.add_extension(self._get_full_path('uBlock-Origin.crx'))  # iframe対策の広告ブロッカー
             # chrome_options.add_extension(self._get_full_path('hlifkpholllijblknnmbfagnkjneagid.crx'))  # CAPTCHA
 
 
