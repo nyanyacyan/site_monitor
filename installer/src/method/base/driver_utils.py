@@ -63,7 +63,7 @@ class Wait:
 # ----------------------------------------------------------------------------------# URLが変わるまで待機 デフォルト10秒
 # self.driver_wait._url_change(current_url=, timeout=)
 
-    def _url_change(self, current_url, field_name, timeout: int=10):
+    def _url_change(self, current_url, field_name, timeout: int=20):
         try:
             WebDriverWait(self.chrome, timeout).until(EC.url_changes(current_url))
             self.logger.debug(f"{field_name} URLの切り替え成功")
