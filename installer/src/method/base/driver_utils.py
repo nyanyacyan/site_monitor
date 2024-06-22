@@ -70,17 +70,11 @@ class Wait:
 
         except TimeoutException as e:
             self.logger.error(f"{field_name} URLの切り替えされるまで、{timeout}秒以上経過したためタイムアウト: {e}")
-            self.error_discord.process(
-                f"{field_name} URLの切り替えされるまで、{timeout}秒以上経過したためタイムアウト: {e}",
-                str(e)
-            )
+            raise
 
         except Exception as e:
             self.logger.error(f"{field_name} URLの切り替えの待機中になんらかのエラーが発生 {e}")
-            self.error_discord.process(
-                f"{field_name}: URLの切り替えの待機中になんらかのエラーが発生",
-                str(e)
-            )
+            raise
 
 
 # ----------------------------------------------------------------------------------
@@ -94,17 +88,11 @@ class Wait:
 
         except TimeoutException as e:
             self.logger.error(f"{field_name} クリックが可能になるまで、{timeout}秒以上経過したためタイムアウト: {e}")
-            self.error_discord.process(
-                f"{field_name} クリックが可能になるまで、{timeout}秒以上経過したためタイムアウト: {e}",
-                str(e)
-            )
+
 
         except Exception as e:
             self.logger.error(f"{field_name} クリックが可能になるまでの待機中になんらかのエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name} クリックが可能になるまでの待機中になんらかのエラーが発生: {e}",
-                str(e)
-            )
+
 
 
 # ----------------------------------------------------------------------------------
@@ -118,17 +106,12 @@ class Wait:
 
         except TimeoutException as e:
             self.logger.error(f"{field_name} クリックが可能になるまで、{timeout}秒以上経過したためタイムアウト: {e}")
-            self.error_discord.process(
-                f"{field_name} クリックが可能になるまで、{timeout}秒以上経過したためタイムアウト: {e}",
-                str(e)
-            )
+            raise
 
         except Exception as e:
             self.logger.error(f"{field_name} クリックが可能になるまでの待機中になんらかのエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name} クリックが可能になるまでの待機中になんらかのエラーが発生: {e}",
-                str(e)
-            )
+            raise
+
 
 
 # ----------------------------------------------------------------------------------# 指定の要素がDOM上に存在するまで待機
@@ -142,17 +125,12 @@ class Wait:
 
         except TimeoutException as e:
             self.logger.error(f"{field_name} ページが更新されるまで、{timeout}秒以上経過したためタイムアウト: {e}")
-            self.error_discord.process(
-                f"{field_name} ページが更新されるまで、{timeout}秒以上経過したためタイムアウト: {e}",
-                str(e)
-            )
+            raise
 
         except Exception as e:
             self.logger.error(f"{field_name} ページが更新されるまでの待機中になんらかのエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: Uページが更新されるまでの待機中になんらかのエラーが発生: {e}",
-                str(e)
-            )
+            raise
+
 
 # ----------------------------------------------------------------------------------
 # 次のページに移動後にページがちゃんと開いてる状態か全体を確認してチェックする
@@ -166,17 +144,11 @@ class Wait:
 
         except TimeoutException as e:
             self.logger.error(f"{field_name} ページが更新されるまで、{timeout}秒以上経過したためタイムアウト: {e}")
-            self.error_discord.process(
-                f"{field_name} ページが更新されるまで、{timeout}秒以上経過したためタイムアウト: {e}",
-                str(e)
-            )
+            raise
 
         except Exception as e:
             self.logger.error(f"{field_name} ページが更新されるまでの待機中になんらかのエラーが発生: {e}")
-            self.error_discord.process(
-                f"{field_name}: Uページが更新されるまでの待機中になんらかのエラーが発生: {e}",
-                str(e)
-            )
+            raise
 
 
 # ----------------------------------------------------------------------------------
