@@ -59,7 +59,10 @@ class AsyncGetPickle:
         tasks = []
 
         for account_id in self.account_ids:
-            tasks.append(self._run_with_semaphore(account_id=account_id))
+            task = asyncio.create_task(self._run_with_semaphore(account_id=account_id))
+            tasks.append(task)
+            await asyncio.sleep(10)
+
 
         # すべてのタスクを非同期にて並列処理を実行する
         self.logger.info("これより並列処理を実行")
@@ -72,7 +75,8 @@ class AsyncGetPickle:
     async def _run_with_semaphore(self, account_id):
         async with self.semaphore:
             flow = Flow(account_id=account_id)
-            await flow.get_pickle_data_async()
+            result = await flow.get_pickle_data_async()
+            return result
 
 
 # ----------------------------------------------------------------------------------
