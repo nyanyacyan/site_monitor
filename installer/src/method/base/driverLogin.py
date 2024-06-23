@@ -432,6 +432,60 @@ class AutoLogin:
             self.logger.info("********** switch_window 終了 **********")
 
 
+
+# ----------------------------------------------------------------------------------
+# 対象のサイトを開く
+
+    def sever_open_site(self, url, by_pattern, check_path, notify_func, field_name):
+
+        # サイトを開く前にurlを確認
+        self.logger.debug(f"{field_name} url: {url}")
+        self.logger.debug(f"{field_name} by_pattern: {by_pattern} , check_path: {check_path}")
+
+        self.logger.info("対象のサイトを開く")
+
+        self.chrome.get(url)
+        current_url = self.chrome.current_url
+        self.logger.debug(f"{field_name} URL: {current_url}")
+
+        try:
+            print(f'by_pattern: {by_pattern}')
+            self.logger.debug(f"IDなどを入力 ができるかを確認")
+
+            self.driver_wait._sever_element_clickable(by_pattern=by_pattern, element_path=check_path, notify_func=notify_func , field_name=field_name)
+
+            self.logger.debug(f"{field_name}  入力準備 完了")
+
+        except TimeoutException as e:
+            self.logger.info(f"{field_name} 初回ロードに10秒以上かかってしまったためリロード: {e}")
+
+            self.chrome.refresh()
+            try:
+                self.logger.debug(f"IDなどを入力 ができるかを確認")
+                self.driver_wait._element_clickable(by_pattern=by_pattern, element_path=check_path, field_name=field_name)
+                self.logger.debug(f"{field_name}  入力準備 完了")
+
+            except TimeoutException as e:
+                self.logger.info(f"{field_name} 2回目のロードエラーのためタイムアウト: {e}")
+
+
+        except NoSuchElementException as e:
+            self.logger.error(f" 要素が見つかりません: {by_pattern}: {check_path}, {e}")
+
+
+        except WebDriverException as e:
+            self.logger.error(f"{field_name} webdriverでのエラーが発生: {e}")
+
+
+        except Exception as e:
+            self.logger.error(f"{field_name} 処理中にエラーが発生: {e}")
+
+
+        time.sleep(2)
+
+
+# ----------------------------------------------------------------------------------
+
 # ----------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------

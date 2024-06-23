@@ -23,7 +23,7 @@ from .base.utils import Logger
 from .base.driver_get_element import GetElement
 from .base.pkl_change import PickleControl
 from .diff_df_processing import DiffDfProcess
-from .base.notify import LineNotify
+from .base.notify import LineNotify, DiscordNotify
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -51,6 +51,7 @@ class Flow:
         self.pkl_control = PickleControl(chrome=self.chrome, debug_mode=debug_mode)
         self.diff_df_processing = DiffDfProcess(chrome=self.chrome, debug_mode=debug_mode)
         self.line = LineNotify(debug_mode=debug_mode)
+        self.discord = DiscordNotify(debug_mode=debug_mode)
 
         # 現時刻を掲載
         self.current_date = datetime.now().strftime('%m-%d %H:%M')
@@ -70,11 +71,15 @@ class Flow:
         # 指定のスプシから情報を取得
         brand_name = self.start_spreadsheet.get_brand_name()
         url = self.start_spreadsheet.get_url()
+        self.discord.discord_image_notify()
 
         self.logger.info(f"brand_name: {brand_name}, url: {url}")
 
         # 指定のurlにアクセス
-        self.auto_login.open_site(url=url)
+        self.auto_login.sever_open_site(
+            url=url,
+            notify_func=self.discord.discord_image_notify
+        )
 
 
         # 商品のリスト読み込む

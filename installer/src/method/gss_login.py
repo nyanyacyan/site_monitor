@@ -44,11 +44,11 @@ class OverAutoLogin(AutoLogin):
         super().__init__(chrome, debug_mode)
 
 
-    def open_site(self, url):
+    def sever_open_site(self, url, notify_func):
         by_pattern='id'
         check_path='searchOrder'
         field_name='open_site'
-        return super().open_site(url, by_pattern, check_path, field_name)
+        return super().open_site(url, by_pattern, check_path, notify_func, field_name)
 
 
 ####################################################################################

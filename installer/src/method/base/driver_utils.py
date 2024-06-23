@@ -7,6 +7,7 @@
 
 
 import os
+from datetime import datetime
 
 
 from selenium.webdriver.common.by import By
@@ -60,10 +61,11 @@ class Wait:
         return mapping.get(locator.upper())
 
 
-# ----------------------------------------------------------------------------------# URLが変わるまで待機 デフォルト10秒
+# ----------------------------------------------------------------------------------
+# # URLが変わるまで待機 デフォルト10秒
 # self.driver_wait._url_change(current_url=, timeout=)
 
-    def _url_change(self, current_url, field_name, timeout: int=20):
+    def _url_change(self, current_url, field_name, timeout: int=10):
         try:
             WebDriverWait(self.chrome, timeout).until(EC.url_changes(current_url))
             self.logger.debug(f"{field_name} URLの切り替え成功")
@@ -152,4 +154,103 @@ class Wait:
 
 
 # ----------------------------------------------------------------------------------
-# 指定の要素がDOM上に存在するまで待機
+#! サーバー用にスクショチェックができるように修正
+# クリックができるようになるまで待機 デフォルト10秒
+# self.driver_wait._element_clickable(by_pattern=, xpath=, timeout=)
+
+    def _sever_element_clickable(self, by_pattern, element_path, notify_func, field_name, timeout=10):
+        try:
+            WebDriverWait(self.chrome, timeout).until(EC.element_to_be_clickable((self._locator_select(by_pattern), element_path)))
+            self.logger.debug(f"{field_name} クリックできる状態")
+
+        except TimeoutException as e:
+            time_out_message = f"{field_name} クリックが可能になるまで、{timeout}秒以上経過したためタイムアウト: {e}"
+
+            self.screenshot_process(message=time_out_message, notify_func=notify_func)
+
+        except Exception as e:
+            self.logger.error(f"{field_name} クリックが可能になるまでの待機中になんらかのエラーが発生: {e}")
+
+
+# ----------------------------------------------------------------------------------
+# スクショ撮影
+
+    def _get_screenshot(self):
+        # スクショ用のタイムスタンプ
+        timestamp = datetime.now().strftime("%m-%d_%H-%M")
+
+        filename = f"lister_page_{timestamp}.png"
+
+        # 絶対path
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # 現在のスクリプトの親ディレクトリのパス
+        parent_dir = os.path.dirname(script_dir)
+
+        # スクショ保管場所の絶対path
+        screenshot_dir = os.path.join(parent_dir, 'DebugScreenshot/')
+
+        # もしディレクトリがなかったら作成
+        if not os.path.exists(screenshot_dir):
+            os.makedirs(screenshot_dir)
+            self.logger.debug(f"ディレクトリがなかったため作成{screenshot_dir}")
+
+        full_path = os.path.join(screenshot_dir, filename)
+
+        # スクリーンショットを保存
+        screenshot_saved = self.chrome.save_screenshot(full_path)
+        if screenshot_saved:
+            self.logger.debug(f"スクリーンショットを保存: {full_path}")
+
+        return full_path
+
+
+# ----------------------------------------------------------------------------------
+# スクショ削除
+
+    def _delete_screenshot(self, screenshot_path):
+        try:
+            self.logger.info(f"********** _delete_screenshot start **********")
+
+            self.logger.debug(f"screenshot_path: {screenshot_path}")
+
+            if screenshot_path and os.path.exists(screenshot_path):
+                os.remove(screenshot_path)
+                self.logger.debug(f"スクショの削除、完了: {screenshot_path}")
+
+            else:
+                self.logger.error(f"スクショが見つかりません: {screenshot_path}")
+
+
+            self.logger.info(f"********** _delete_screenshot end **********")
+
+        except Exception as e:
+            self.logger.error(f"_delete_screenshot 処理中にエラーが発生:{e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------
+# スクショプロセス
+
+    def screenshot_process(self, message, notify_func):
+        try:
+            self.logger.info(f"********** screenshot_process start **********")
+
+            # スクショを撮影
+            screenshot_path = self._get_screenshot()
+
+            # スクショを添付して通知
+            notify_func(message, screenshot_path)
+
+            # スクショを削除
+            self._delete_screenshot(screenshot_path)
+
+            self.logger.info(f"********** screenshot_process end **********")
+
+
+        except Exception as e:
+            self.logger.error(f"screenshot_process 処理中にエラーが発生:{e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------

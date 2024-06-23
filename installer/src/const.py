@@ -6,6 +6,9 @@
 # ----------------------------------------------------------------------------------
 from enum import Enum
 
+class Debug(Enum):
+    discord = ''
+
 
 class AccountId(Enum):
     account_id_a = "BRAND_A"
@@ -27,4 +30,4 @@ class EndPoint(Enum):
     Line ="https://notify-api.line.me/api/notify"
     Chatwork = 'https://api.chatwork.com/v2'
     Slack = 'https://slack.com/api/chat.postMessage'
-    Discord = ''
+    Discord = 'https://discord.com/api/webhooks/1220239805204660314/niMRY1OVJwYh3PY9X9EfF2O6C7ZPhukRDoXfsXlwGBz4n1HKE81MA1B6TQiy2FUnzHfk'
