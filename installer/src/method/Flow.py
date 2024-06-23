@@ -71,7 +71,6 @@ class Flow:
         # 指定のスプシから情報を取得
         brand_name = self.start_spreadsheet.get_brand_name()
         url = self.start_spreadsheet.get_url()
-        self.discord.discord_image_notify()
 
         self.logger.info(f"brand_name: {brand_name}, url: {url}")
 

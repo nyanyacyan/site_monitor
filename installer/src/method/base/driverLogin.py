@@ -449,9 +449,6 @@ class AutoLogin:
         self.logger.debug(f"{field_name} URL: {current_url}")
 
         try:
-            print(f'by_pattern: {by_pattern}')
-            self.logger.debug(f"IDなどを入力 ができるかを確認")
-
             self.driver_wait._sever_element_clickable(by_pattern=by_pattern, element_path=check_path, notify_func=notify_func , field_name=field_name)
 
             self.logger.debug(f"{field_name}  入力準備 完了")

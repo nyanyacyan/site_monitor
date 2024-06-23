@@ -48,7 +48,9 @@ class OverAutoLogin(AutoLogin):
         by_pattern='id'
         check_path='searchOrder'
         field_name='open_site'
-        return super().open_site(url, by_pattern, check_path, notify_func, field_name)
+        return super().sever_open_site(url, by_pattern, check_path, notify_func, field_name)
+
+
 
 
 ####################################################################################
