@@ -29,10 +29,10 @@ class Main:
 
       account_ids = [
          AccountId.account_id_a.value,
-         AccountId.account_id_b.value,
-         AccountId.account_id_c.value,
-         AccountId.account_id_d.value,
-         AccountId.account_id_e.value
+         # AccountId.account_id_b.value,
+         # AccountId.account_id_c.value,
+         # AccountId.account_id_d.value,
+         # AccountId.account_id_e.value
       ]
 
       async_process = AsyncProcess(account_ids=account_ids)

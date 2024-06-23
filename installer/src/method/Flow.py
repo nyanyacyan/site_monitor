@@ -97,8 +97,8 @@ class Flow:
         # DataFrameとDataFrameを突合させて差分の真偽値別に処理をする
         self.diff_df_processing.diff_df_processing(
             data=dict_data,
+            route='result_output/pickles',
             pkl_name=f' {self.account_id} ',
-            pkl_path='installer/result_output/pickles/',
             head_num=30,
             select_column='goodsid',
             opening_message=f'{self.current_date}\n新しい商品が入荷を検知しました。\n下記の商品をご確認ください。\n',

@@ -444,6 +444,8 @@ class AutoLogin:
 
         self.logger.info("対象のサイトを開く")
 
+        time.sleep(2)
+
         self.chrome.get(url)
         current_url = self.chrome.current_url
         self.logger.debug(f"{field_name} URL: {current_url}")

@@ -94,7 +94,6 @@ class PickleControl:
             self.logger.info(f"******** _pickle_df start ********")
 
             self.logger.debug(f"pkl_name: {pkl_name}")
-            self.logger.debug(f"pkl_path: {pkl_path}")
 
             pkl_to_df = None
 
@@ -102,6 +101,8 @@ class PickleControl:
             pkl_file_name = pkl_name.strip()
 
             pkl_full_path = os.path.join(pkl_path, f'{pkl_file_name}.pkl')
+
+            self.logger.warning(f"pkl_full_path: {pkl_full_path}")
 
             if os.path.exists(pkl_full_path):
                 # pickleデータ読み込んでDataFrameにする
