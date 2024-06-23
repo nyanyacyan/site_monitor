@@ -59,8 +59,7 @@ class AsyncGetPickle:
         tasks = []
 
         for account_id in self.account_ids:
-            task = asyncio.create_task(self._run_with_semaphore(account_id=account_id))
-            tasks.append(task)
+            tasks.append(self._run_with_semaphore(account_id=account_id))
             await asyncio.sleep(10)
 
 

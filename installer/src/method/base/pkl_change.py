@@ -96,6 +96,8 @@ class PickleControl:
             self.logger.debug(f"pkl_name: {pkl_name}")
             self.logger.debug(f"pkl_path: {pkl_path}")
 
+            pkl_to_df = None
+
             # 前後についてしまってる余計な空白を除去
             pkl_file_name = pkl_name.strip()
 
