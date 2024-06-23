@@ -47,12 +47,14 @@ class ChromeManager:
             chrome_options = Options()
             chrome_options.add_argument("--headless=new")  # ヘッドレスモードで実行
             chrome_options.add_argument(f"--window-position=0,0")
-            chrome_options.add_argument("--window-size=1440,900")  # ウィンドウサイズの指定
+            # chrome_options.add_argument("--window-size=1440,900")  # ウィンドウサイズの指定
             chrome_options.add_argument("start-maximized")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_experimental_option('useAutomationExtension', False)
             chrome_options.add_argument('--lang=ja-JP')
+
+            # ヘッドレスでの場合に「user-agent」を設定することでエラーを返すものを通すことができる
             chrome_options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.6478.63 Safari/537.36')
             # chrome_options.add_extension(self._get_full_path('uBlock-Origin.crx'))  # iframe対策の広告ブロッカー
             # chrome_options.add_extension(self._get_full_path('hlifkpholllijblknnmbfagnkjneagid.crx'))  # CAPTCHA
