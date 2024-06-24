@@ -57,7 +57,7 @@ class DiffDfProcess:
                 diff_row_df = self.df_create.df_row_diff_value(current_df=current_df, old_df=old_df, head_num=head_num, select_column=select_column, account_id=account_id)
 
                 # 返ってくる値によって実行処理を変更する
-                self.df_create.is_result_branch(diff_row_df=diff_row_df, opening_message=opening_message, notify_func=notify_func, save_func=save_func, key_df=current_df, save_pickle_path=save_pickle_path)
+                self.df_create.is_result_branch(diff_row_df=diff_row_df, opening_message=opening_message, notify_func=notify_func, save_func=save_func, key_df=current_df, save_pickle_path=pkl_path)
 
                 self.logger.info(f"********** {account_id} diff_df_processing end **********")
 

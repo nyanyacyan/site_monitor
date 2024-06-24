@@ -104,7 +104,7 @@ class Flow:
             opening_message=f'{self.current_date}\n新しい商品が入荷を検知しました。\n下記の商品をご確認ください。\n',
             notify_func=self.line.line_notify,
             save_func=self.pkl_control.df_pickle,
-            save_pickle_path=f'installer/result_output/pickles/{self.account_id}.pkl',
+            save_pickle_path=f'result_output/pickles/{self.account_id}.pkl',
             account_id=self.account_id
         )
 
