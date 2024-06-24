@@ -131,15 +131,20 @@ class PickleControl:
 # ----------------------------------------------------------------------------------
 # DataFrameからpickleデータへ変換
 
-    def df_pickle(self, df, save_pickle_path):
+    def df_pickle(self, df, route, pickle_name):
         try:
             self.logger.info(f"******** df_pickle start ********")
 
             self.logger.debug(f"df:\n{df.head(3)}")
-            self.logger.debug(f"save_pickle_path:{save_pickle_path}")
+            self.logger.debug(f"route:{route}")
+            self.logger.debug(f"save_pickle_path:{pickle_name}")
+
+            route_path = self._get_route_path(route)
+
+            pickle_full_path= '/'.join(route_path, pickle_name)
 
             if not df.empty:
-                df.to_pickle(save_pickle_path)
+                df.to_pickle(pickle_full_path)
 
             else:
                 raise ValueError('pkl_data is None ')
@@ -158,6 +163,28 @@ class PickleControl:
 
 
 # ----------------------------------------------------------------------------------
+# pickleディレクトリまでのフルパスの生成
 
+    def _get_route_path(self, route) -> str:
+
+        # method ディレクトリに移動
+        method_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # src ディレクトリに移動
+        src_dir = os.path.dirname(method_dir)
+
+        # installer ディレクトリに移動
+        installer_dir = os.path.dirname(src_dir)
+
+        # スクショ保管場所の絶対path
+        installer_dir = os.path.join(installer_dir, 'result_output/pickles/')
+
+        full_path = os.path.join(installer_dir, route)
+        self.logger.debug(f"full_path: {full_path}")
+
+        return full_path
+
+
+# ----------------------------------------------------------------------------------
 # **********************************************************************************
 
