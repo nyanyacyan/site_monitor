@@ -141,10 +141,13 @@ class PickleControl:
 
             route_path = self._get_route_path(route)
 
-            pickle_full_path= '/'.join(route_path, pickle_name)
+            self.logger.warning(f"route_path: {route_path}")
+
+            pickle_full_path= os.path.join(route_path, pickle_name)
 
             if not df.empty:
                 df.to_pickle(pickle_full_path)
+                self.logger.info("pickleに保存完了")
 
             else:
                 raise ValueError('pkl_data is None ')
@@ -167,17 +170,26 @@ class PickleControl:
 
     def _get_route_path(self, route) -> str:
 
+        # base ディレクトリに移動
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+
+        self.logger.debug(f"base_dir: {base_dir}")
+
         # method ディレクトリに移動
-        method_dir = os.path.dirname(os.path.abspath(__file__))
+        method_dir = os.path.dirname(base_dir)
+
+        self.logger.debug(f"method_dir: {method_dir}")
 
         # src ディレクトリに移動
         src_dir = os.path.dirname(method_dir)
 
+        self.logger.debug(f"src_dir: {src_dir}")
+
         # installer ディレクトリに移動
         installer_dir = os.path.dirname(src_dir)
 
-        # スクショ保管場所の絶対path
-        installer_dir = os.path.join(installer_dir, 'result_output/pickles/')
+        self.logger.debug(f"installer_dir: {installer_dir}")
+
 
         full_path = os.path.join(installer_dir, route)
         self.logger.debug(f"full_path: {full_path}")

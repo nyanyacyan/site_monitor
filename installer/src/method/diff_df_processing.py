@@ -33,7 +33,7 @@ class DiffDfProcess:
 # ----------------------------------------------------------------------------------
 # DataFrameとDataFrameを突合させて差分の真偽値別に処理をする
 
-    def diff_df_processing(self, data, route, pkl_name, head_num, select_column, opening_message, notify_func, save_func, save_route, pickle_name, account_id):
+    def diff_df_processing(self, data, route, pkl_name, head_num, select_column, opening_message, notify_func, save_func, save_route, pickle_name, new_order, link, account_id):
         try:
             self.logger.info(f"********** {account_id} diff_df_processing start **********")
 
@@ -59,9 +59,11 @@ class DiffDfProcess:
                 # 返ってくる値によって実行処理を変更する
                 self.df_create.is_result_branch(
                     diff_row_df=diff_row_df,
+                    new_order=new_order,
                     opening_message=opening_message, notify_func=notify_func, save_func=save_func,
                     key_df=current_df,
-                    route=save_route,
+                    link=link,
+                    save_route=save_route,
                     pickle_name=pickle_name
                 )
 
@@ -81,7 +83,7 @@ class DiffDfProcess:
 
 
 # ----------------------------------------------------------------------------------
-# chrome拡張機能のフルパス生成
+# フルパス生成
 
     def _get_route_path(self, route) -> str:
 
@@ -93,6 +95,8 @@ class DiffDfProcess:
 
         # home ディレクトリに移動
         installer_dir = os.path.dirname(src_dir)
+
+        self.logger.debug(f'installer_dir: {installer_dir}')
 
         # スクショ保管場所の絶対path
         route_path = os.path.join(installer_dir, route)

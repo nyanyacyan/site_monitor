@@ -1255,22 +1255,25 @@ class DFCreate:
 # ----------------------------------------------------------------------------------
 # 返ってくる値によって実行処理を変更する
 
-    def is_result_branch(self, diff_row_df, opening_message, notify_func, save_func, key_df, route, pickle_name):
+    def is_result_branch(self, diff_row_df, new_order, opening_message, link, notify_func, save_func, key_df, save_route, pickle_name):
         try:
             self.logger.info(f"********** result_process start **********")
 
             if diff_row_df is not None and not diff_row_df.empty:
                 self.logger.debug(f"diff_row_df:\n{diff_row_df.head(3)}")
 
-                # 結果のDataFrameを通知に掲載するtextに変換
-                self._df_to_message(df=diff_row_df, opening_message=opening_message)
+                # DataFrameを並び替えする
+                df = self.df_sort(df=diff_row_df, new_order=new_order)
 
-                notify_func(diff_row_df)
+                # 結果のDataFrameを通知に掲載するtextに変換
+                message = self._df_to_message(df=df, opening_message=opening_message, link=link)
+
+                notify_func(message)
                 time.sleep(2)
-                save_func(key_df, route, pickle_name)
+                save_func(key_df, save_route, pickle_name)
 
             else:
-                save_func(key_df, route, pickle_name)
+                save_func(key_df, save_route, pickle_name)
 
             self.logger.info(f"********** result_process end **********")
 
@@ -1283,31 +1286,86 @@ class DFCreate:
 # ----------------------------------------------------------------------------------
 # 結果のDataFrameを通知に掲載するtextに変換
 
-    def _df_to_message(self, df, opening_message):
+    def _df_to_message(self, df, opening_message, link):
         try:
             self.logger.info(f"********** result_process start **********")
 
+
             if opening_message:
-                df_text = df.to_string()
+                item_info = []
 
-                self.logger.debug(f"df_text: {df_text}")
+                for index, row in df.iterrows():
+                    self.logger.debug(f"{index}, ")
+                    item_info.append(f"{index + 1}, {row['brand']}\n{row['name']}\n{row['status']}\n{row['price']}")
 
-                df_message = f"{opening_message}\n\n{df_text}"
 
-                self.logger.debug(f"df_message: {df_message}")
+                    # for column in columns:
+                    #     self.logger.debug(f"column: {column}")
+                    #     self.logger.warning(type(column))
+                    #     item_info.append(f"{index + 1}, {columns}")
+
+                # self.logger.warning(f"item_info\n{item_info}")
+
+                message = '\n\n'.join(item_info)
+
+                self.logger.debug(type(message))
+
+                self.logger.warning(f"message: {message}")
+
+
+                full_message = f"{opening_message}\n\n{message}\n\n{link}"
+
+                self.logger.debug(f"df_message: {full_message}")
 
                 self.logger.info(f"********** result_process end **********")
 
-                return df_message
+                return full_message
 
             else:
                 self.logger.warning(f"付け加えるメッセージがありません")
-                return df_text
+                raise
 
 
         except Exception as e:
                 self.logger.error(f"result_process  処理中にエラーが発生: {e}")
                 raise
+
+
+# ----------------------------------------------------------------------------------
+# DataFrameを並び替える
+
+    def df_sort(self, df, new_order):
+        try:
+            self.logger.info(f"******** df_sort 開始 ********")
+
+            self.logger.debug(f"df: \n{df.head(3)}")
+            self.logger.debug(f"new_order: {new_order}")
+
+            if not df.empty:
+                if all(col in df.columns for col in new_order):
+                    sorted_df = df[new_order]
+
+
+
+                else:
+                    sorted_df.to_csv('installer/result_output/sorted_df.csv')
+                    raise ValueError("new_orderで指定してるcolumnがDataFrameに存在しない")
+
+
+            self.logger.debug(f"df: \n{sorted_df.head(3)}")
+
+            self.logger.info(f"******** df_sort 終了 ********")
+
+            return sorted_df
+
+        except ValueError as ve:
+            self.logger.error(f"new_orderで指定してるcolumnがDataFrameに存在しない: {ve}")
+            raise
+
+        except Exception as e:
+            self.logger.error(f"df_sort 処理中にエラーが発生: {e}")
+            messagebox.showerror(' df_sort エラー', '処理中にエラーが発生')
+            raise
 
 
 # ----------------------------------------------------------------------------------
