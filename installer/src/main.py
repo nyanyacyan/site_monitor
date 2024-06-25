@@ -10,7 +10,7 @@ import asyncio
 from const import AccountId
 
 from method.base.utils import Logger
-from method.AsyncProcess import AsyncProcess
+from method.Flow import Flow
 
 
 
@@ -24,20 +24,22 @@ class Main:
       self.logger = self.setup_logger.setup_logger()
 
 
-   async def main(self):
+   def main(self):
       start_time = time.time()
 
       account_ids = [
-         # AccountId.account_id_a.value,
+         AccountId.account_id_a.value,
          AccountId.account_id_b.value,
-         # AccountId.account_id_c.value,
-         # AccountId.account_id_d.value,
-         # AccountId.account_id_e.value
+         AccountId.account_id_c.value,
+         AccountId.account_id_d.value,
+         AccountId.account_id_e.value
       ]
 
-      async_process = AsyncProcess(account_ids=account_ids)
+      for account_id in account_ids:
+         flow = Flow(account_id=account_id)
+         flow.single_process()
 
-      await async_process.flow_task_process()
+         time.sleep(3)
 
       end_time = time.time()
 
@@ -52,4 +54,4 @@ class Main:
 
 if __name__ == '__main__':
    main_process = Main()
-   asyncio.run(main_process.main())
+   main_process.main()
