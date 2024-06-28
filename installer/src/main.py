@@ -32,7 +32,12 @@ class Main:
          AccountId.account_id_b.value,
          AccountId.account_id_c.value,
          AccountId.account_id_d.value,
-         AccountId.account_id_e.value
+         AccountId.account_id_e.value,
+         AccountId.account_id_f.value,
+         AccountId.account_id_g.value,
+         AccountId.account_id_h.value,
+         AccountId.account_id_i.value,
+         AccountId.account_id_j.value
       ]
 
       for account_id in account_ids:

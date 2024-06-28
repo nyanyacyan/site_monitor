@@ -6,6 +6,7 @@
 import os
 import pandas as pd
 
+
 from .base.utils import Logger
 from .base.df_Create import DFCreate
 from .base.pkl_change import PickleControl
@@ -51,7 +52,9 @@ class DiffDfProcess:
 
                 # old_dfがなかったらエラーを出す
                 if old_df is None or old_df.empty:
-                    raise ValueError('pkl_data is None ')
+                    self.logger.warning("old_df がないため新しく作成")
+                    raise
+                    # raise ValueError('pkl_data is None ')
 
                 # ２つのDataFrameの行単位での差分を出す
                 diff_row_df = self.df_create.df_row_diff_value(current_df=current_df, old_df=old_df, head_num=head_num, select_column=select_column, account_id=account_id)
@@ -77,9 +80,10 @@ class DiffDfProcess:
             self.logger.error(f"pkl_data None {ve}")
             raise
 
+
         except Exception as e:
-                self.logger.error(f"diff_df_processing  処理中にエラーが発生: {e}")
-                raise
+            self.logger.error(f"diff_df_processing  処理中にエラーが発生: {e}")
+            raise
 
 
 # ----------------------------------------------------------------------------------

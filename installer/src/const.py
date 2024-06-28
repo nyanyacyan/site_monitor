@@ -16,6 +16,12 @@ class AccountId(Enum):
     account_id_c = "BRAND_C"
     account_id_d = "BRAND_D"
     account_id_e = "BRAND_E"
+    account_id_f = "BRAND_F"
+    account_id_g = "BRAND_G"
+    account_id_h = "BRAND_H"
+    account_id_i = "BRAND_I"
+    account_id_j = "BRAND_J"
+
 
 
 
