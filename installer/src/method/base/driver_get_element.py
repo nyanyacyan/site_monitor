@@ -124,6 +124,8 @@ class GetElement:
             # 要素の集合体を取得（大枠）
             items = self._get_elements(by_pattern=by_pattern, xpath=items_xpath)
 
+            self.logger.warning(f"items:\n{items}")
+
             data_list = []
 
             # 形式が「WebElement」の場合には単一担ってしまうため繰り返し処理ができないためリストへ変換
@@ -147,9 +149,22 @@ class GetElement:
 
                     # 同列からの要素の取得は「attribute」にて取得
                     if method == 'attribute':
-                        # 辞書のKeyを指定して値を代入
-                        self.logger.debug(f"key: {key}")
-                        elements_dict[key] = item.get_attribute(detail_xpath)
+
+                        if key == 'item_link':
+                            try:
+                                # aタグを見つける
+                                element = item.find_element(By.XPATH, detail_xpath)
+                                attribute_value = element.get_attribute('href')
+                                self.logger.debug(f"Attribute value: {attribute_value}")
+                                elements_dict[key] = attribute_value
+                            except Exception as e:
+                                self.logger.error(f"Error finding element or attribute: {e}")
+                                elements_dict[key] = None
+
+                        else:
+                            # 辞書のKeyを指定して値を代入
+                            self.logger.debug(f"key: {key}")
+                            elements_dict[key] = item.get_attribute(detail_xpath)
 
                     # htmlの子要素のTextを取得する
                     elif method == 'text':

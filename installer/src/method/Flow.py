@@ -90,7 +90,7 @@ class Flow:
                 'name': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_name']"},
                 'status': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_status']"},
                 'price': {'method': 'text', 'detail_xpath': ".//p[contains (@class, 'itemCard_price')]"},
-                'item_link':  {'method': 'attribute', 'detail_xpath': ".//a[@class='itemCard_inner']/@href"}
+                'item_link':  {'method': 'attribute', 'detail_xpath': ".//a[@class='itemCard_inner']"}
             },
         )
         time.sleep(2)
@@ -144,7 +144,7 @@ class Flow:
         self.logger.info(f"brand_name: {brand_name}, url: {url}")
 
         # 指定のurlにアクセス
-        self.auto_login.open_site(url=url)
+        self.auto_login.sever_open_site(url=url, notify_func=self.discord.discord_image_notify)
 
 
         # 商品のリスト読み込む
@@ -156,16 +156,19 @@ class Flow:
                 'name': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_name']"},
                 'status': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_status']"},
                 'price': {'method': 'text', 'detail_xpath': ".//p[contains (@class, 'itemCard_price')]"},
-                'item_link':  {'method': 'attribute', 'detail_xpath': ".//a[@class='itemCard_inner']/@href"}
+                'item_link':  {'method': 'attribute', 'detail_xpath': ".//a[@class='itemCard_inner']"}
             },
         )
         time.sleep(2)
 
         first_df = pd.DataFrame(dict_data)
 
+        self.logger.debug(f"first_df:\n{first_df.head(3)}")
+
         self.pkl_control.df_pickle(
             df=first_df,
-            save_pickle_path=f'installer/result_output/pickles/{self.account_id}.pkl'
+            route='result_output/pickles',
+            pickle_name=f'{self.account_id}.pkl',
         )
 
         self.logger.debug(f"*****{self.account_id} get_pickle_data end*****")

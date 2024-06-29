@@ -1312,14 +1312,19 @@ class DFCreate:
 
                 self.logger.warning(f"message: {message}")
 
-
+                # カテゴリ別のリンクあり
                 full_message = f"{opening_message}\n\n{message}\n\n{link}"
+
+                # カテゴリ別のリンクなし
+                full_message_nolink = f"{opening_message}\n\n{message}"
 
                 self.logger.debug(f"df_message: {full_message}")
 
+                self.logger.debug(f"df_message: {full_message_nolink}")
+
                 self.logger.info(f"********** result_process end **********")
 
-                return full_message
+                return full_message_nolink
 
             else:
                 self.logger.warning(f"付け加えるメッセージがありません")
