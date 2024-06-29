@@ -1296,7 +1296,7 @@ class DFCreate:
 
                 for index, row in df.iterrows():
                     self.logger.debug(f"{index}, ")
-                    item_info.append(f"{index + 1}, {row['brand']}\n{row['name']}\n{row['status']}\n{row['price']}")
+                    item_info.append(f"{index + 1}, {row['brand']}\n{row['name']}\n{row['status']}\n{row['price']}\n{row['item_link']}")
 
 
                     # for column in columns:

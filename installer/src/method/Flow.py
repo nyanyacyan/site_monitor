@@ -86,11 +86,11 @@ class Flow:
             items_xpath="//div[@id='searchResultListWrapper']//li[@class='js-favorite itemCard']",
             data_xpaths={
                 'goodsid':  {'method': 'attribute', 'detail_xpath': 'goodsid'},
-                'link':  {'method': 'attribute', 'detail_xpath': ".//a[@class='itemCard_inner']/@href"},
                 'brand': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_brand']"},
                 'name': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_name']"},
                 'status': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_status']"},
-                'price': {'method': 'text', 'detail_xpath': ".//p[contains (@class, 'itemCard_price')]"}
+                'price': {'method': 'text', 'detail_xpath': ".//p[contains (@class, 'itemCard_price')]"},
+                'item_link':  {'method': 'attribute', 'detail_xpath': ".//a[@class='itemCard_inner']/@href"}
             },
         )
         time.sleep(2)
@@ -106,7 +106,7 @@ class Flow:
             notify_func=self.line.line_notify,
             save_func=self.pkl_control.df_pickle,
             save_route='result_output/pickles',
-            new_order=['brand', 'name', 'status', 'price'],
+            new_order=['brand', 'name', 'status', 'price', 'item_link'],
             link=url,
             pickle_name=f'{self.account_id}.pkl',
             account_id=self.account_id
@@ -155,7 +155,8 @@ class Flow:
                 'brand': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_brand']"},
                 'name': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_name']"},
                 'status': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_status']"},
-                'price': {'method': 'text', 'detail_xpath': ".//p[contains (@class, 'itemCard_price')]"}
+                'price': {'method': 'text', 'detail_xpath': ".//p[contains (@class, 'itemCard_price')]"},
+                'item_link':  {'method': 'attribute', 'detail_xpath': ".//a[@class='itemCard_inner']/@href"}
             },
         )
         time.sleep(2)
