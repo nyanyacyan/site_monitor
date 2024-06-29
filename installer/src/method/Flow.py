@@ -100,7 +100,7 @@ class Flow:
             data=dict_data,
             route='result_output/pickles',
             pkl_name=f' {self.account_id} ',
-            head_num=30,
+            head_num=20,
             select_column='goodsid',
             opening_message=f'{self.current_date}\n\n{self.account_id}\n\n新しい商品が入荷を検知しました。\n下記の商品をご確認ください。\n',
             notify_func=self.line.line_notify,
