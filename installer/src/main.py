@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------------
 
 
-import time
+import time, os
 import asyncio
 from const import AccountId
 
@@ -52,6 +52,7 @@ class Main:
 
       self.logger.info(f"処理時間 : {diff_time}秒")
 
+      os.system("afplay /System/Library/Sounds/Glass.aiff")
 
 # ------------------------------------------------------------------------------
 
