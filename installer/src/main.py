@@ -7,6 +7,7 @@
 
 import time, os
 import asyncio
+import jupyter_beeper
 from const import AccountId
 
 from method.base.utils import Logger
@@ -26,7 +27,8 @@ class Main:
 
    def main(self):
       start_time = time.time()
-
+      b = jupyter_beeper.Beeper()
+      # (重い処理)
       account_ids = [
          AccountId.account_id_a.value,
          AccountId.account_id_b.value,
@@ -52,7 +54,7 @@ class Main:
 
       self.logger.info(f"処理時間 : {diff_time}秒")
 
-      os.system("afplay /System/Library/Sounds/Glass.aiff")
+      b.beep(frequency=100, secs=1, blocking=True) # ここでブザー音が鳴る
 
 # ------------------------------------------------------------------------------
 

@@ -83,7 +83,7 @@ class Logger:
                 console_handler.setFormatter(log_format)
 
                 # ログファイルの保存先ディレクトリを設定
-                log_directory = "installer/src/method/logs"
+                log_directory = self.get_logger_full_path(route="src/method/logs")
 
                 # 各モジュールの名前でログファイルを分ける
                 log_filename = f"{log_directory}/{module_name}_debug.log"
@@ -118,9 +118,35 @@ class Logger:
 
 
 # ----------------------------------------------------------------------------------
+# フルパス取得
 
-# print(sys.path)
+    def get_logger_full_path(self, route):
+        try:
+            # self.logger.info(f"******** get_logger_full_path start ********")
 
+            # base ディレクトリに移動
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+
+            # method ディレクトリに移動
+            method_dir = os.path.dirname(base_dir)
+
+            # src ディレクトリに移動
+            src_dir = os.path.dirname(method_dir)
+
+            # installer ディレクトリに移動
+            installer_dir = os.path.dirname(src_dir)
+
+            # 保存先までのpathとホームディレクトリを結合
+            full_path = os.path.join(installer_dir, route)
+            self.logger.debug(f"full_path: {full_path}")
+
+            # self.logger.info(f"******** get_logger_full_path end ********")
+
+            return full_path
+
+        except Exception as e:
+            self.logger.error(f"get_logger_full_path 処理中にエラーが発生{e}")
+            raise
 
 
 ####################################################################################
