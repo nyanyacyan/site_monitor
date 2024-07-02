@@ -24,6 +24,9 @@ else
     echo "$(date) - Python 3.8.10 already installed"
 fi
 
+# パッケージのインストール
+echo "$(date) - Installing required Python libraries"
+sudo /usr/local/bin/python3.8 -m pip install -r /home/ec2-user/site_monitor/bin/requirements.txt
 
 # スクリプトの開始
 echo "$(date) - Starting script"
