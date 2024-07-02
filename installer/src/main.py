@@ -19,7 +19,7 @@ from method.Flow import Flow
 
 
 class Main:
-   def __init__(self, debug_mode=False) -> None:
+   def __init__(self, debug_mode=False):
       # logger
       self.setup_logger = Logger(__name__, debug_mode=debug_mode)
       self.logger = self.setup_logger.setup_logger()
