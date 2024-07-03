@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # ログファイルの消去
+echo "$(date) - Cleaning up /my_script.log..."
 > /var/log/my_script.log
+echo "$(date) - Cleanup completed."
+
 
 # ログファイルの設定
 LOG_FILE="/var/log/my_script.log"
