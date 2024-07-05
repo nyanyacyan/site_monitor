@@ -15,6 +15,7 @@ exec > >(tee -a $LOG_FILE) 2>&1
 source /home/ec2-user/venv/bin/activate
 
 # 環境変数の設定
+#! 依頼書に記載
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
 export AWS_DEFAULT_REGION=
