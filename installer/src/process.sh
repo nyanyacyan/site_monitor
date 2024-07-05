@@ -14,6 +14,11 @@ exec > >(tee -a $LOG_FILE) 2>&1
 # shellcheck disable=SC1091
 source /home/ec2-user/venv/bin/activate
 
+# 環境変数の設定
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+export AWS_DEFAULT_REGION=
+
 # スクリプトの開始
 {
     # 日本時間に修正
