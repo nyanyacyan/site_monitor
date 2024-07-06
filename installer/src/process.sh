@@ -18,7 +18,7 @@ source /home/ec2-user/venv/bin/activate
 #! 依頼書に記載
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
-export AWS_DEFAULT_REGION=
+export AWS_DEFAULT_REGION=ap-northeast-1
 
 # スクリプトの開始
 {
@@ -32,8 +32,7 @@ export AWS_DEFAULT_REGION=
 
     # /tmp ディレクトリのクリーンアップ
     echo "$(date) - Cleaning up /tmp directory..."
-    find /tmp -type f -atime +10 -exec rm -f {} \;
-    find /tmp -type d -empty -atime +10 -exec rm -rf {} \;
+    sudo rm -rf /tmp/.org.chromium.Chromium.*
     echo "$(date) - Cleanup completed."
 
     # 仮想環境のディアクティベート
@@ -42,7 +41,7 @@ export AWS_DEFAULT_REGION=
     # インスタンスを停止
     echo "$(date) - Stopping instance"
     sleep 10
-    aws ec2 stop-instances --instance-ids i-0a1629d8026f15e8c
+    aws ec2 stop-instances --instance-ids i-07e411bca7ebac231
 
     echo "$(date) - Script finished"
 }  | tee -a $LOG_FILE
