@@ -31,11 +31,9 @@ export AWS_DEFAULT_REGION=ap-northeast-1
     python main.py
 
     # /tmp ディレクトリのクリーンアップ
-    # echo "$(date) - Cleaning up /tmp directory..."
-    # sudo rm -rf /tmp/.org.chromium.Chromium.*
-    # sudo rm -rf /var/log/messages
-    # sudo rm -rf /var/log/messages-20240701
-    # echo "$(date) - Cleanup completed."
+    echo "$(date) - Cleaning up /tmp directory..."
+    sudo rm -rf /tmp/.org.chromium.Chromium.*
+    echo "$(date) - Cleanup completed."
 
     # 仮想環境のディアクティベート
     deactivate
