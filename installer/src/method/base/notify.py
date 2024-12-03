@@ -31,14 +31,14 @@ class LineNotify:
 # ----------------------------------------------------------------------------------
 # LINE本文のみ送信
 
-    def line_notify(self, message):
+    def line_notify(self, line_token, message):
         try:
             self.logger.info(f"********** line_notify start **********")
 
             self.logger.debug(f"message: {message}")
 
             line_end_point = const.EndPoint.Line.value
-            headers = {'Authorization': f'Bearer {self.line_token}'}
+            headers = {'Authorization': f'Bearer {line_token}'}
             data = {'message': message}
 
             response = requests.post(line_end_point, headers = headers, data=data)
@@ -71,14 +71,14 @@ class LineNotify:
 # ----------------------------------------------------------------------------------
 # LINE 本文＋画像を送信
 
-    def line_image_notify(self, message, image_path):
+    def line_image_notify(self, line_token, message, image_path):
         try:
             self.logger.info(f"********** line_image_notify start **********")
 
             self.logger.debug(f"message: {message}")
 
             line_end_point = const.EndPoint.Line.value
-            headers = {'Authorization': f'Bearer {self.line_notify_token}'}
+            headers = {'Authorization': f'Bearer {line_token}'}
             data = {'message': message}
 
             image_file = image_path

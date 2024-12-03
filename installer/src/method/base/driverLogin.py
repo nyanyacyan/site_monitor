@@ -450,6 +450,9 @@ class AutoLogin:
         current_url = self.chrome.current_url
         self.logger.debug(f"{field_name} URL: {current_url}")
 
+        self.logger.critical(f'ここを確認する: {url}')
+        self.driver_wait._js_page_checker(field_name=field_name)
+
         try:
             self.driver_wait._sever_element_clickable(by_pattern=by_pattern, element_path=check_path, notify_func=notify_func , field_name=field_name)
 
