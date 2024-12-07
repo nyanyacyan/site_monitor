@@ -229,3 +229,24 @@ class Wait:
 
         except Exception as e:
             self.logger.error(f" google_map_api_request 処理中にエラーが発生: {e}")
+
+# ----------------------------------------------------------------------------------
+# 次のページに移動後にページがちゃんと開いてる状態か全体を確認してチェックする
+#? JavaScriptCommand
+# self.driver_wait._js_page_update_checker(field_name=, timeout=10)
+
+    def _js_page_checker(self, field_name, timeout=10):
+        try:
+            WebDriverWait(self.chrome, timeout).until(lambda driver: driver.execute_script('return document.readyState')=='complete')
+            self.logger.debug(f"{field_name} ページが更新されてます。")
+
+        except TimeoutException as e:
+            self.logger.error(f"{field_name} ページが更新されるまで、{timeout}秒以上経過したためタイムアウト: {e}")
+            raise
+
+        except Exception as e:
+            self.logger.error(f"{field_name} ページが更新されるまでの待機中になんらかのエラーが発生: {e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------
