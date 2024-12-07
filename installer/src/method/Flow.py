@@ -86,7 +86,7 @@ class Flow:
             items_xpath="//div[@id='searchResultListWrapper']//li[@class='js-favorite itemCard']",
             data_xpaths={
                 'goodsid':  {'method': 'attribute', 'detail_xpath': 'goodsid'},
-                'brand': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_brand']"},
+                'brand': {'method': 'text', 'detail_xpath': ".//div[@class='itemCard_body']//p[@class='itemCard_brand']"},
                 'name': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_name']"},
                 'status': {'method': 'text', 'detail_xpath': ".//p[@class='itemCard_status']"},
                 'price': {'method': 'text', 'detail_xpath': ".//p[contains (@class, 'itemCard_price')]"},

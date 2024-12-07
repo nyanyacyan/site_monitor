@@ -4,15 +4,18 @@
 
 
 # ----------------------------------------------------------------------------------
-
+import time
 
 from selenium.common.exceptions import (NoSuchElementException)
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.remote.webelement import WebElement
 
 # 自作モジュール
 from .utils import Logger
 from .driver_base import Wait
+
 
 
 ###############################################################
@@ -89,6 +92,8 @@ class GetElement:
             self.logger.debug(f"text_pattern: {text_pattern}")
             self.logger.debug(f"text_xpath: {text_xpath}")
 
+            self._wait_element(by_pattern=text_pattern, xpath=text_xpath, field_name=__name__)
+
             # 要素にあるTextを取得
             # strip()はTextの前後にある空白を除去してくれる
             text_elements = element.find_element(self._locator_select(text_pattern), text_xpath).text.strip()
@@ -106,6 +111,42 @@ class GetElement:
 
         except Exception as e:
             self.logger.error(f"_get_element 処理中にエラーが発生: {e}")
+            raise
+
+
+# ----------------------------------------------------------------------------------
+
+
+    def _wait_element(self, by_pattern, xpath, field_name):
+        try:
+            start_time = time.time()
+
+            parent_xpath = xpath.rsplit("//", 1)[0]
+            parent_element = self.chrome.find_element(By.XPATH, parent_xpath)
+
+            parent_html = parent_element.get_attribute("outerHTML")
+
+            self.logger.debug(f"Parent HTML: {parent_html}")
+            with open("parent_element.html", "w", encoding="utf-8") as f:
+                f.write(parent_html)
+
+            element = WebDriverWait(self.chrome, 20).until(
+                EC.presence_of_element_located((by_pattern, xpath))
+            )
+            end_time = time.time()
+            diff_time = end_time - start_time
+
+            self.logger.debug(f"DOMの更新はされています text: {element.text}")
+            self.logger.debug(f"処理時間: {diff_time} 秒")
+
+            return element
+
+        except NoSuchElementException:
+            self.logger.debug(f"NoSuchElementExceptionが発生: 要素が見つかりません")
+            return None
+
+        except Exception as e:
+            self.logger.error(f"指定のPathの要素の確認をしている際にエラーが発生 \n{e}")
             raise
 
 
