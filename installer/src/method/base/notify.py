@@ -446,6 +446,10 @@ class DiscordNotify:
 
             self.logger.debug(f"message: {message}")
 
+            max_length = 1950
+            if len(message) > max_length:
+                message = message[:max_length] + '\n\n文字数制限があるため、詳しくはサイトにてご確認ください'
+
             end_point = const.EndPoint.Discord.value
 
             response = requests.post(end_point, data={"content": message})

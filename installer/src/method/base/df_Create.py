@@ -1267,6 +1267,7 @@ class DFCreate:
 
                 # 結果のDataFrameを通知に掲載するtextに変換
                 message = self._df_to_message(df=df, opening_message=opening_message, link=link)
+                self.logger.critical(f'message:\n{message}')
 
                 notify_func(message)
                 time.sleep(2)
