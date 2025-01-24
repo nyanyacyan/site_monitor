@@ -45,6 +45,7 @@ venv_shopers_scraping/
 # exeファイル
 *.exe
 
+*.sh
 
 # batふぁいる
 *.bat

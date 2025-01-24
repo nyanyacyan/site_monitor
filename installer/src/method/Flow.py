@@ -23,7 +23,7 @@ from .base.utils import Logger
 from .base.driver_get_element import GetElement
 from .base.pkl_change import PickleControl
 from .diff_df_processing import DiffDfProcess
-from .base.notify import LineNotify, DiscordNotify
+from .base.notify import ChatworkNotify, DiscordNotify
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -50,7 +50,7 @@ class Flow:
         self.get_element = GetElement(chrome=self.chrome, debug_mode=debug_mode)
         self.pkl_control = PickleControl(chrome=self.chrome, debug_mode=debug_mode)
         self.diff_df_processing = DiffDfProcess(chrome=self.chrome, debug_mode=debug_mode)
-        self.line = LineNotify(debug_mode=debug_mode)
+        self.chatwork = ChatworkNotify(debug_mode=debug_mode)
         self.discord = DiscordNotify(debug_mode=debug_mode)
 
         # 現時刻を掲載
@@ -103,7 +103,7 @@ class Flow:
             head_num=20,
             select_column='goodsid',
             opening_message=f'{self.current_date}\n\n{self.account_id}\n\n新しい商品が入荷を検知しました。\n下記の商品をご確認ください。\n',
-            notify_func=self.discord.discord_notify,
+            notify_func=self.chatwork.chatwork_notify,
             save_func=self.pkl_control.df_pickle,
             save_route='result_output/pickles',
             new_order=['brand', 'name', 'status', 'price', 'item_link'],

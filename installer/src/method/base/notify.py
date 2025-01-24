@@ -139,7 +139,7 @@ class ChatworkNotify:
 
             end_point = const.EndPoint.Chatwork.value
 
-            url = end_point + '/rooms/' + str(self.chatwork_roomid) + '/messages'
+            url = f'{end_point}/rooms/{self.chatwork_roomid}/messages'
 
 
             headers = { 'X-ChatWorkToken': self.chatwork_notify_token}
