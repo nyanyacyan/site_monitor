@@ -35,23 +35,13 @@ class Flow:
         self.sheet_url = SiteUrl.sheet.value
         self.account_id = account_id
 
+        self.debug_mode = debug_mode
+
         # logger
         self.setup_logger = Logger(__name__, debug_mode=debug_mode)
         self.logger = self.setup_logger.setup_logger()
 
-        # Chrome
-        chrome_instance = ChromeManager()
-        self.chrome = chrome_instance.setup_chrome()
 
-        # インスタンス
-        self.start_spreadsheet = StartSpreadsheetRead(sheet_url=self.sheet_url, account_id=account_id)
-        self.auto_login = OverAutoLogin(chrome=self.chrome, debug_mode=debug_mode)
-        self.drop_down = Drop(chrome=self.chrome, debug_mode=debug_mode)
-        self.get_element = GetElement(chrome=self.chrome, debug_mode=debug_mode)
-        self.pkl_control = PickleControl(chrome=self.chrome, debug_mode=debug_mode)
-        self.diff_df_processing = DiffDfProcess(chrome=self.chrome, debug_mode=debug_mode)
-        self.chatwork = ChatworkNotify(debug_mode=debug_mode)
-        self.discord = DiscordNotify(debug_mode=debug_mode)
 
         # 現時刻を掲載
         self.current_date = datetime.now().strftime('%m-%d %H:%M')
@@ -64,6 +54,20 @@ class Flow:
 
     def single_process(self):
         self.logger.debug(f"*****{self.account_id} process start*****")
+
+        # Chrome
+        chrome_instance = ChromeManager()
+        self.chrome = chrome_instance.setup_chrome()
+
+        # インスタンス
+        self.start_spreadsheet = StartSpreadsheetRead(sheet_url=self.sheet_url, account_id=self.account_id)
+        self.auto_login = OverAutoLogin(chrome=self.chrome, debug_mode=self.debug_mode)
+        self.drop_down = Drop(chrome=self.chrome, debug_mode=self.debug_mode)
+        self.get_element = GetElement(chrome=self.chrome, debug_mode=self.debug_mode)
+        self.pkl_control = PickleControl(chrome=self.chrome, debug_mode=self.debug_mode)
+        self.diff_df_processing = DiffDfProcess(chrome=self.chrome, debug_mode=self.debug_mode)
+        self.chatwork = ChatworkNotify(debug_mode=self.debug_mode)
+        self.discord = DiscordNotify(debug_mode=self.debug_mode)
 
         self.logger.info(f"self.sheet_url: {self.sheet_url}")
         self.logger.info(f"self.account_id: {self.account_id}")
@@ -102,8 +106,8 @@ class Flow:
             pkl_name=f' {self.account_id} ',
             head_num=20,
             select_column='goodsid',
-            opening_message=f'{self.current_date}\n\n{self.account_id}\n\n新しい商品が入荷を検知しました。\n下記の商品をご確認ください。\n',
-            notify_func=self.chatwork.chatwork_notify,
+            opening_message=f'{self.current_date}\n\n---------- {self.account_id} ----------\n\n新しい商品が入荷を検知しました。\n下記の商品をご確認ください。\n',
+            notify_func=self.discord.discord_notify,
             save_func=self.pkl_control.df_pickle,
             save_route='result_output/pickles',
             new_order=['brand', 'name', 'status', 'price', 'item_link'],
@@ -114,7 +118,9 @@ class Flow:
 
         self.logger.debug(f"*****{self.account_id} process end*****")
 
-        self.logger.warning(f"{self.account_id} 処理、完了しました。")
+        result_success = "処理完了"
+        self.logger.warning(f"{self.account_id} {result_success}")
+        return result_success
 
 
 # ----------------------------------------------------------------------------------

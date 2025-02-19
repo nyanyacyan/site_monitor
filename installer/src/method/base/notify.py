@@ -442,7 +442,7 @@ class DiscordNotify:
 
     def discord_notify(self, message):
         try:
-            self.logger.info(f"********** slack_notify start **********")
+            self.logger.info(f"********** discord_notify start **********")
 
             self.logger.debug(f"message: {message}")
 
@@ -455,11 +455,11 @@ class DiscordNotify:
             response = requests.post(end_point, data={"content": message})
 
             if response.status_code == 204:
-                self.logger.info(f"********** slack_notify end **********")
+                self.logger.info(f"********** discord_notify end **********")
                 return self.logger.info(f"送信処理完了")
 
             else:
-                self.logger.info(f"********** slack_notify end **********")
+                self.logger.info(f"********** discord_notify end **********")
                 return self.logger.error(f"送信に失敗しました: ステータスコード {response.status_code},{response.text}")
 
 

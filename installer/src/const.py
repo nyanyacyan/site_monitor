@@ -21,7 +21,16 @@ class AccountId(Enum):
     account_id_h = "BRAND_H"
     account_id_i = "BRAND_I"
     account_id_j = "BRAND_J"
-
+    account_id_k = "BRAND_K"
+    account_id_l = "BRAND_L"
+    account_id_m = "BRAND_M"
+    account_id_n = "BRAND_N"
+    account_id_o = "BRAND_O"
+    account_id_p = "BRAND_P"
+    account_id_q = "BRAND_Q"
+    account_id_r = "BRAND_R"
+    account_id_s = "BRAND_S"
+    account_id_t = "BRAND_T"
 
 
 
@@ -36,4 +45,5 @@ class EndPoint(Enum):
     Line ="https://notify-api.line.me/api/notify"
     Chatwork = 'https://api.chatwork.com/v2'
     Slack = 'https://slack.com/api/chat.postMessage'
-    Discord = 'https://discord.com/api/webhooks/1220239805204660314/niMRY1OVJwYh3PY9X9EfF2O6C7ZPhukRDoXfsXlwGBz4n1HKE81MA1B6TQiy2FUnzHfk'
+    Discord = 'https://discord.com/api/webhooks/1341640718955053057/00MzVUHiUw__y-IjKGSRBg7D5VtgPbD24xyeSaPR5rML6uxZ3kkAw4mahWmJ3b04JsEm'
+
