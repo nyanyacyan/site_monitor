@@ -140,5 +140,5 @@ class MainParallel:
 
 if __name__ == '__main__':
 
-    main_process = MainParallel()
+    main_process = Main()
     main_process.main()
